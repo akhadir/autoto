@@ -1,0 +1,22 @@
+{
+  "name": "autotos",
+  "version": "1.0.0",
+  "description": "Automation of Automation",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "gulp build"
+  },
+  "keywords": [
+    "Automation"
+  ],
+  "author": "khadir.k@gmail.com",
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-clean": "^0.4.0",
+    "gulp-rename": "^1.4.0",
+    "gulp-run-command": "0.0.9",
+    "run-sequence": "^2.2.1"
+  }
+}
