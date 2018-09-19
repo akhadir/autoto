@@ -3,6 +3,7 @@ var winOver;
 (function () {
     winOver = {
         observedAjaxCalls: [],
+        takenScreenShots: {},
         isFocusable: function (node) {
             var out, tag = node.tagName;
             if (tag == 'A' || tag == "SELECT" || tag == "INPUT" || tag == "AREA" ||
@@ -164,7 +165,6 @@ var winOver;
                         break;
                     }
                 }
-                ;
             }
             return out;
         },
@@ -204,6 +204,25 @@ var winOver;
             else {
                 throw "JQUERY INJECT IS NOT WORKING";
             }
+        },
+        takeScreenShot: function (node, id) {
+            window.html2canvas($(node)[0], {  
+                onrendered: function(canvas) {
+                  var img = canvas.toDataURL()
+                  winOver.takenScreenShots[id] = img;
+                } 
+            });
+        },
+        getScreenShots: function (id) {
+            var out = '';
+            if (winOver.takenScreenShots[id]) {
+                out = winOver.takenScreenShots[id];
+                delete winOver.takenScreenShots[id];
+            }
+            return out;
+        },
+        getRect: function (node) {
+            return JSON.stringify($(node)[0].getBoundingClientRect());
         }
     };
     var dispatcherEvent = function (target, ...args) {

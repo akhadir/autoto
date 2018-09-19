@@ -13,6 +13,7 @@
                 }
                 break;
         }
+        return true;
     });
 })();
 //# sourceMappingURL=bgNew.js.map

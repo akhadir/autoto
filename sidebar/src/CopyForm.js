@@ -5,14 +5,13 @@ export default class CopyForm extends Component {
     constructor(props) {
         super(props);
         this.data = props.data;
-        this.events = this.data.events;
         this.state = props.settings;
     };
     componentWillReceiveProps(props) {
         this.forceUpdate();
     }
     copyText = () => {
-        return JSON.stringify(this.events, null, 4);
+        return JSON.stringify(this.data, null, 4);
     };
     render = () => {
         return (

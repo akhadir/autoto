@@ -1,5 +1,4 @@
 "use strict";
-var DomAgents;
 (function (DomAgents) {
     DomAgents.DomAgent = {
         reqIndex: 0,
@@ -33,6 +32,12 @@ var DomAgents;
             }
             else if (type === 'DATA_POST_EVENTS') {
                 DomWorker.postEvents(request);
+            }
+            else if (type === 'DATA_REQ_SCREEN_SHOT') {
+                DomWorker.getScreen(request);
+            }
+            else if (type === 'DATA_REQ_WINDOW_URL') {
+                DomWorker.getInspWindowURL(request);
             }
             else {
                 if (this.size(this.requestQueue) === 0) {
@@ -85,7 +90,91 @@ var DomAgents;
     };
     var ajaxCalls = {};
     var DomWorker = {
-        getSelector(req) {
+        getInspWindowURL: function (req) {
+            chrome.tabs.get(chrome.devtools.inspectedWindow.tabId, function(tab) {
+                req.callback(tab.url);
+            });
+        },
+        getScreen: function (req) {
+            chrome.tabs.get(chrome.devtools.inspectedWindow.tabId, function(tab) {
+                chrome.tabs.captureVisibleTab(tab.windowId, {format: "png"}, function(res) {
+                    var origCallback = req.callback;
+                    req.callback = function (newRes) {
+                        origCallback({ image: res, clip: JSON.parse(newRes) });
+                    }
+                    DomWorker.getRect(req);
+                });
+            });
+        },
+        takeScreenShot: function (req) {
+            var self = this,
+                node = "body",
+                id;
+            if (req.root) {
+                node = req.root;
+            }
+            id = window.md5(node);
+            var code = "winOver.takeScreenShot('" + node + "', '" + id + "')";
+            chrome.devtools.inspectedWindow.eval(code, {
+                "useContentScriptContext": true
+            }, function (result, isException) {
+                if (!isException) {
+                    self.getScreenShot(id, req.callback);
+                }
+                else {
+                    console.log(code);
+                    console.log("Exception: " + JSON.stringify(isException));
+                }
+            });
+        },
+        getScreenShot: function (id, callback, index) {
+            var self = this,
+                code;
+            setTimeout (function () {
+                code = "winOver.getScreenShots('" + id + "')";
+                chrome.devtools.inspectedWindow.eval(code, {
+                    "useContentScriptContext": true
+                }, function (result, isException) {
+                    if (!isException) {
+                        if (result === '') {
+                            if (!index) {
+                                index = 0;
+                            } else {
+                                index++;
+                            }
+                            if (index <= 5) {
+                                self.getScreenShot(id, callback, index);
+                            } else {
+                                console.log("Exception: No of attempts to capture screen shot has exceeded.");
+                            }
+                        } else {
+                            callback(result);
+                        }
+                    }
+                    else {
+                        console.log(code);
+                        console.log("Exception: " + JSON.stringify(isException));
+                    }
+                });
+            }, 1000);
+        },
+        getRect: function(req) {
+            var node = req.root,
+                code = "winOver.getRect('" + node + "')";
+            chrome.devtools.inspectedWindow.eval(code, {
+                "useContentScriptContext": true
+            }, function (result, isException) {
+                if (!isException) {
+                    if (req.callback) {
+                        req.callback(result);
+                    }
+                }
+                else {
+                    console.log("Exception" + isException);
+                }
+            });
+        },
+        getSelector: function(req) {
             var data = { "selector": undefined }, code = "winOver.getSelector($0, ''," + req.data.usi + ")";
             if (req.root) {
                 code = "winOver.getSelector($0, '" + req.root + "', " + req.data.usi + ")";
@@ -174,7 +263,7 @@ var DomAgents;
                     entry = log.entries[i];
                     header = DomWorker._find(entry.request.headers, "name", "X-Requested-With");
                     if (header && header['value'] === "XMLHttpRequest") {
-                        id = md5.md5(JSON.stringify(entry));
+                        id = window.md5(JSON.stringify(entry));
                         if (!ajaxCalls[id]) {
                             entry.request.clearPrev = false;
                             data.push(entry.request);
@@ -223,5 +312,5 @@ var DomAgents;
             });
         }
     };
-})(DomAgents || (DomAgents = {}));
+})(window);
 //# sourceMappingURL=DomAgent.js.map

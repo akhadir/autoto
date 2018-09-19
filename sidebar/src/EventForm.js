@@ -1,59 +1,87 @@
 import React, { Component } from 'react';
-// import domAgent from "../../chromeJs/DomAgent";
+import Utils from './Utils';
+
 export default class EventForm extends Component {
+    state =  {event: null};
     constructor(props) {
         super(props);
         this.settings = props.settings;
-        this.value = props.event;
-        this.key = props.index;
+        this.state.event = props.event;
     };
     eventChange = (e) => {
-        this.value.event = parseInt(e.target.value, 10);
-        this.forceUpdate();
+        var eventIndex = parseInt(e.target.value, 10);
+        var event = JSON.parse(JSON.stringify(this.state.event));
+        event.event = eventIndex;
+        this.setState({event: event});
+        this.props.event.event = eventIndex;
+    };
+    removeEvent = function (e) {
+        this.props.remove(this.props.index);
+        e.preventDefault();
+    };
+    componentDidUpdate = (prevProps) => {
+        if (prevProps !== this.props) {
+            this.setState({event: this.props.event});
+        }
     };
     changeEventTimer = (e) => {
-        this.value.timer = parseInt(e.target.value, 10);
+        var timer = parseInt(e.target.value, 10);
+        var event = JSON.parse(JSON.stringify(this.state.event));
+        event.timer = timer;
+        this.setState({event: event});
+        this.props.event.timer = timer;
     };
     valueChange = (e) => {
-        this.value.evalue = e.target.value;
+        var event = JSON.parse(JSON.stringify(this.state.event));
+        event.evalue = e.target.value;
+        this.setState({event: event});
+        this.props.event.evalue = event.evalue;
     };
     selectorChange = (e) => {
-        this.value.node = e.target.value;
+        if (!this.selectorUpdate) {
+            var event = JSON.parse(JSON.stringify(this.state.event));
+            event.node = e.target.value;
+            this.setState({event: event});
+            this.props.event.node = event.node;
+        }
+        this.selectorUpdate = false;
+    };
+    runEvent = (e) => {
+        Utils.runEvent(this.state.event);
+        e.preventDefault();
+    };
+    selectNodeFromBrowser = (e) => {
+        var that = this;
+        Utils.getSelector(function (res) {
+            that.selectorUpdate = true;
+            var event = JSON.parse(JSON.stringify(that.state.event));
+            event.node = res;
+            that.setState({event: event});
+            that.props.event.node = event.node;
+        });
     };
     controlButtons = () => {
         var buttons = null;
-        if (this.value.event > 0) {
+        if (this.state.event.event > 0) {
             buttons = (
                 <div className='event-controls'>
-                    <button className="run-event btn btn-sm btn-primary" data-index={this.key}>Run</button>
-                    <button className="remove-event btn btn-sm btn-primary" data-index={this.key}>Remove</button>
+                    <button className="run-event btn btn-sm btn-primary" data-index={this.key} onClick={this.runEvent}>Run</button>
+                    <button className="remove-event btn btn-sm btn-primary" data-index={this.key} onClick={this.removeEvent.bind(this)}>Remove</button>
                 </div>
             );
         }
         return buttons;
     };
-    getSelector = (callback) => {
-        // domAgent.process({ type: "DATA_REQ_SEL", callback: callback, data: { usi: true } });
-    };
-    getSelectorFromRoot = (root, callback) => {
-        // domAgent.process({ type: "DATA_REQ_SEL_WITH_ROOT", root: root, callback: callback, data: { usi: true } });
-    };
-    selectNodeFromBrowser = (e) => {
-        var that = this;
-        this.getSelector(function (res) {
-            that.value.event.node = res;
-            that.forceUpdate();
-        });
-    };
     render = () => {
+        var event = this.state.event;
         return (
             <React.Fragment>
                 <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4">
                     <label htmlFor={`sbAddEvent${this.key}`}>Select an Event: </label>
                 </div>
                 <div className="col-xs-12 col-sm-6 col-md-8 col-lg-8">
-                    <input name="eventNode" onClick={this.selectNodeFromBrowser} title="CSS Selector of Element" placeholder="Element" className="event-node input-sm" id={`sbAddEvent${this.key}`} onChange={this.selectorChange} defaultValue={this.value.node}></input>
-                    <select className="input-sm" defaultValue={this.value.event} onChange={this.eventChange}>
+                    <input name="eventNode" onClick={this.selectNodeFromBrowser} title="CSS Selector of Element" placeholder="Element" className="event-node input-sm" id={`sbAddEvent${this.key}`} onChange={this.selectorChange} value={event.node}></input>
+                    <select className="input-sm" defaultValue={event.event} onChange={this.eventChange}>
                         <option value="0">PageLoad</option>
                         <option value="1">Click</option>
                         <option value="2">Change</option>
@@ -67,8 +95,8 @@ export default class EventForm extends Component {
                         <option value="10">DoubleClick</option>
                         <option value="11">Submit</option>
                     </select>
-                    <input type="text" name="evalue" className="evalue input-sm" onChange={this.valueChange} defaultValue={this.value.evalue} placeholder="Value If Any" title="Value to be added to selected element"></input>
-                    <input type="number" min="0" max="15" name="timer" className="timer input-sm" defaultValue={this.value.timer} onChange={this.changeEventTimer} size="2" max-length="2" title="Timer in Seconds" placeholder="Timer"></input>
+                    <input type="text" name="evalue" className="evalue input-sm" onChange={this.valueChange} value={event.evalue} placeholder="Value If Any" title="Value to be added to selected element"></input>
+                    <input type="number" min="0" max="15" name="timer" className="timer input-sm" value={event.timer} onChange={this.changeEventTimer} size="2" max-length="2" title="Timer in Seconds" placeholder="Timer"></input>
                     {this.controlButtons()}
                 </div>
             </React.Fragment>

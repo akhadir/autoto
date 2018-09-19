@@ -1,6 +1,6 @@
 "use strict";
 (function () {
-    var pollFlag = true, ajaxCalls = [], domAgent = DomAgents.DomAgent, tcSidebar, tcPanel;
+    var pollFlag = true, ajaxCalls = [], domAgent = window.DomAgent, tcSidebar, tcPanel;
     domAgent.init("POLL_REQ");
     chrome.devtools.panels.create("Autoto", "icon.png", "panel.html", function (panel) {
         tcPanel = panel;
