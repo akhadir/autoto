@@ -25,7 +25,7 @@ export default class ScreenForm extends Component {
             that.selectorUpdate = true;
             var screen = {node: val, image: that.state.screen.image};
             that.setState({screen: screen});
-            this.props.screen.node = screen.node;
+            that.props.screen.node = screen.node;
         });
     };
     nodeChange = (e) => {
@@ -47,11 +47,12 @@ export default class ScreenForm extends Component {
     };
   
     takeScreenShot = (e) => {
-        var that = this;
-        Utils.getScreenShot(this.value.node, function (data) {
-            var screen = {node: that.state.value, image: data};
+        var that = this,
+            screenNode = this.state.screen.node;
+        Utils.getScreenShot(screenNode, function (data) {
+            var screen = {node: screenNode, image: data};
             that.setState({screen: screen});
-            this.props.screen.image = screen.image;
+            that.props.screen.image = data;
         });
         e.preventDefault();
     };
