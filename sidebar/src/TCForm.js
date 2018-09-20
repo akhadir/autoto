@@ -4,7 +4,7 @@ import ScreenForm from './ScreenForm';
 import Utils from './Utils';
 
 export default class TCForm extends Component {
-    state = {events: []};
+    state = {events: [], msg: ''};
     constructor(props) {
         super(props);
         var events = [{
@@ -30,15 +30,17 @@ export default class TCForm extends Component {
         });
     }
     addExtraEvent = (e) => {
-        var events = this.state.events;
-        events = events.concat({
-            URL: null,
-            node: '',
-            event: 0,
-            evalue: '',
-            timer: this.props.settings.eventTimer,
-            screens: []
-        });
+        var index = e.target.attributes['data-index'].value,
+            events = JSON.parse(JSON.stringify(this.state.events)),
+            event = {
+                URL: null,
+                node: '',
+                event: 1,
+                evalue: '',
+                timer: this.props.settings.eventTimer,
+                screens: []
+            };
+        events.splice(index + 1, 0, event);
         this.setState({events: events});
         e.preventDefault();
     }
@@ -80,7 +82,8 @@ export default class TCForm extends Component {
             that = this;
         var listItems = this.state.events.map(function(value, key) {
             return (
-                <div className='event-screen' key={key}>
+                <React.Fragment key={key}>
+                <div className='event-screen'>
                     <div className="row form-control-static" data-index={key}>
                         <EventForm settings={settings} index={key} event={value} remove={that.removeEvent.bind(that)}></EventForm>
                     </div>
@@ -89,6 +92,8 @@ export default class TCForm extends Component {
                         <button className="screen-event btn btn-sm btn-secondary" onClick={that.addEventScreen} data-index={key}>+ Add Screen</button>
                     </div>
                 </div>
+                <button className="btn btn-sm btn-secondary" onClick={that.addExtraEvent} data-index={key}>+ Add Event Here</button>
+                </React.Fragment>
             );
         });
         return listItems;
@@ -97,24 +102,60 @@ export default class TCForm extends Component {
         // Utils.runEvents(this.events);
         e.preventDefault();
     };
+    setDataAfterValidation = (strData) => {
+        try {
+            var data = JSON.parse(strData);
+            if (typeof data[0].event !== 'number' || typeof data[0].node !== 'string') {
+                throw new Error("DATA_VALIDATION_EXCEPTION");
+            }
+            this.setState( {events: data });
+        } catch (e) {
+            this.setState({msg: "Data Validation Failed"});
+        }
+    };
+    loadEvents = (e) => {
+        var file = e.target.files[0],
+            data,
+            reader = new FileReader(),
+            that = this;
+        reader.onload = function(fc) {
+            that.setDataAfterValidation(fc.target.result);
+        };
+        reader.readAsText(file);
+    };
+    showMessage = () => {
+        var out = '',
+            that = this;
+        if (this.state.msg) {
+            out = (
+                <div class="alert alert-info message">
+                    <strong>Info!</strong> {this.state.msg}
+                </div>
+            );
+            setTimeout(function () {
+                that.setState({msg: ""});
+            }, 5000)
+        }
+        return out;
+    };
     render = () => {
         return (
             <React.Fragment>
                 <h4>Add TestCases</h4>
                 <form>
+                    {this.showMessage()}
                     <div className="row form-control-static">
                         <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4">
                             <label htmlFor="loadEvents">Load Saved Events: </label>
                         </div>
                         <div className="col-xs-12 col-sm-6 col-md-8 col-lg-8">
-                            <input type="file" id="loadEvents" className="btn btn-sm btn-primary"></input>
+                            <input type="file" id="loadEvents" className="btn btn-sm btn-primary" onChange={this.loadEvents}></input>
                         </div>
                         </div>
                         <div className="form-control-static">
                         {this.eventScreens()}
                         </div>
                         <div className="form-control-static">
-                            <button onClick={this.addExtraEvent} className="add-event btn btn-sm btn-default">+ Add Event</button>
                             <button className="run-events btn btn-sm btn-default" onClick={this.runAllEvents}>Run All Events</button>
                         </div>
                         <div className="form-control-static center">
