@@ -5,6 +5,8 @@ import Utils from './Utils';
 
 export default class TCForm extends Component {
     state = {events: [], msg: ''};
+    props: any;
+    file: any;
     constructor(props) {
         super(props);
         var events = [{
@@ -30,7 +32,7 @@ export default class TCForm extends Component {
         });
     }
     addExtraEvent = (e) => {
-        var index = e.target.attributes['data-index'].value,
+        var index = parseInt(e.target.attributes['data-index'].value, 10),
             events = JSON.parse(JSON.stringify(this.state.events)),
             event = {
                 URL: null,
@@ -65,6 +67,18 @@ export default class TCForm extends Component {
         events.splice(eventIndex, 1);
         this.setState({events: events});
     }
+    dimWidthChange = (e) => {
+        e.preventDefault();
+        var events = JSON.parse(JSON.stringify(this.state.events));
+        events[0].dim.width = e.target.value;
+        this.setState({events: events});
+    };
+    dimHeightChange = (e) => {
+        e.preventDefault();
+        var events = JSON.parse(JSON.stringify(this.state.events));
+        events[0].dim.height = e.target.value;
+        this.setState({events: events});
+    };
     screens = (index) => {
         var settings = this.props.settings,
             that = this,
@@ -77,12 +91,47 @@ export default class TCForm extends Component {
         });
         return listItems;
     };
+    getViewport = (e) => {
+        if (e) {
+            e.preventDefault();
+        }
+        var that = this;
+        Utils.getViewPort(function (dim) {
+            var events = JSON.parse(JSON.stringify(that.state.events));
+            events[0].dim = dim;
+            that.setState({events: events});
+        });        
+    };
+    getViewportForm = (value, index) => {
+        var out = '';
+        if (index === 0) {
+            if (!value.dim) {
+                value.dim = {width: 1680, height: 890};
+            }
+            out = (
+                <div className="viewport-screen">
+                    <div className="row form-control-static">
+                        <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+                            <label htmlFor='viewport'>Viewport: </label>
+                        </div>
+                        <div id='viewport' className="col-xs-12 col-sm-6 col-md-8 col-lg-8">
+                            <input type="text" name="dimx" className="dim input-sm" onChange={this.dimWidthChange} value={value.dim.width}></input>
+                            <input type="text" name="dimx" className="dim input-sm" onChange={this.dimHeightChange} value={value.dim.height}></input>
+                            <button className="btn btn-sm btn-default" onClick={this.getViewport}>Get</button>
+                        </div>
+                    </div>
+                </div>
+            )
+        }
+        return out;
+    };
     eventScreens = () => {
         var settings = this.props.settings,
             that = this;
         var listItems = this.state.events.map(function(value, key) {
             return (
                 <React.Fragment key={key}>
+                {that.getViewportForm(value, key)}
                 <div className='event-screen'>
                     <div className="row form-control-static" data-index={key}>
                         <EventForm settings={settings} index={key} event={value} remove={that.removeEvent.bind(that)}></EventForm>
@@ -156,7 +205,7 @@ export default class TCForm extends Component {
                     {this.showMessage()}
                     <div className="row form-control-static">
                         <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-                            <label htmlFor="loadEvents">Load Saved Events: </label>
+                            <label htmlFor="loadEvents">Load Testcases: </label>
                         </div>
                         <div className="col-xs-12 col-sm-6 col-md-8 col-lg-8">
                             <input type="file" id="loadEvents" className="btn btn-sm btn-primary" onChange={this.loadEvents}></input>

@@ -144,6 +144,13 @@ h3 {
 .App .btn, .App input, .App select {
   margin-right: 5px;
   margin-bottom: 5px;
+  border: 1px solid;
+}
+.App .btn {
+  margin-top: 5px;
+}
+.App label {
+  margin-top: 10px;
 }
 .event-screen {
   border: 1px dotted #555555;
@@ -279,4 +286,7 @@ input[type='file'].save-events-sess {
 .back-btn {
   margin-top: 10px;
   display: inline-block;
+}
+input.dim {
+  width: 50px;
 }

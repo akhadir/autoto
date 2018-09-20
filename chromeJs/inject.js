@@ -223,6 +223,9 @@ var winOver;
         },
         getRect: function (node) {
             return JSON.stringify($(node)[0].getBoundingClientRect());
+        },
+        getViewport: function () {
+            return JSON.stringify({"width": window.innerWidth, "height": window.innerHeight});
         }
     };
     var dispatcherEvent = function (target, ...args) {

@@ -2,6 +2,8 @@ if (!window.DomAgent) {
     window.DomAgent = {process: function () {
         if (arguments[0].type === 'DATA_REQ_WINDOW_URL') {
             arguments[0].callback(window.location.href);
+        } else if (arguments[0].type === 'DATA_REQ_WINDOW_VIEWPORT') {
+            arguments[0].callback(JSON.stringify({"width": window.innerWidth, "height": window.innerHeight}));
         }
     }};
 }
@@ -28,6 +30,11 @@ export default class Utils {
     static getInsWindowURL = (callback) => {
         window.DomAgent.process({type: "DATA_REQ_WINDOW_URL", root: root, callback: callback});
     };
+    static getViewPort = (callback) => {
+        window.DomAgent.process({type: "DATA_REQ_WINDOW_VIEWPORT", callback: function (result) {
+            callback(JSON.parse(result));
+        }});
+    }
     static cropImageToRect = (res, callback) => {
         var imgURL = res.image,
             rect = res.clip,

@@ -39,6 +39,9 @@
             else if (type === 'DATA_REQ_WINDOW_URL') {
                 DomWorker.getInspWindowURL(request);
             }
+            else if (type === 'DATA_REQ_WINDOW_VIEWPORT') {
+                DomWorker.getInspWindowViewPort(request);
+            }
             else {
                 if (this.size(this.requestQueue) === 0) {
                     this.reqIndex = 1;
@@ -90,6 +93,20 @@
     };
     var ajaxCalls = {};
     var DomWorker = {
+        getInspWindowViewPort: function (req) {
+            var code = "winOver.getViewport()";
+            chrome.devtools.inspectedWindow.eval(code, {
+                "useContentScriptContext": true
+            }, function (result, isException) {
+                if (!isException) {
+                    req.callback(result);
+                }
+                else {
+                    console.log(code);
+                    console.log("Exception: " + JSON.stringify(isException));
+                }
+            });
+        },
         getInspWindowURL: function (req) {
             chrome.tabs.get(chrome.devtools.inspectedWindow.tabId, function(tab) {
                 req.callback(tab.url);
