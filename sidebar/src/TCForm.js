@@ -111,17 +111,27 @@ export default class TCForm extends Component {
             this.setState( {events: data });
         } catch (e) {
             this.setState({msg: "Data Validation Failed"});
+            return false;
         }
+        return true;
     };
     loadEvents = (e) => {
         var file = e.target.files[0],
-            data,
             reader = new FileReader(),
             that = this;
         reader.onload = function(fc) {
-            that.setDataAfterValidation(fc.target.result);
+            if (that.setDataAfterValidation(fc.target.result)) {
+                that.file = file;
+            }
         };
         reader.readAsText(file);
+    };
+    downloadButton = () => {
+        var dataStr = 'data:application/json;charset=utf-8,' + escape(JSON.stringify(this.state.events, null, 4)),
+            out = (
+                <a href={dataStr} download="config" className="save-events-sess btn btn-sm btn-primary" title="Save this to a file">Save</a>
+            );
+        return out;
     };
     showMessage = () => {
         var out = '',
@@ -159,9 +169,8 @@ export default class TCForm extends Component {
                             <button className="run-events btn btn-sm btn-default" onClick={this.runAllEvents}>Run All Events</button>
                         </div>
                         <div className="form-control-static center">
-                            <button className="save-events-sess btn btn-sm btn-primary" title="Save this to the current file">Save</button>
-                            <input type="file" className="save-events-sess btn btn-sm btn-primary"title="Save this to a differnt file"></input>
                             <input type="submit" className="btn btn-sm btn-primary" onClick={this.copyAction} value="Copy Testcases"></input>
+                            {this.downloadButton()}
                         </div>
                 </form>
             </React.Fragment>

@@ -38,7 +38,7 @@ class App extends Component {
       if (this.saveSettings.formState === 2) {
           out = (
             <React.Fragment>
-              <a className="back-btn" onClick={this.backAction}><span className="glyphicon glyphicon-menu-left">Back</span></a>
+              <a className="back-btn" onClick={this.backAction}><span className="glyphicon glyphicon-arrow-left"></span></a>
               <CopyForm settings={this.settings} data={this.data}></CopyForm>
             </React.Fragment>
           );

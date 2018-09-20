@@ -29,6 +29,7 @@
     "background",
     "tabs",
     "storage",
+    "file://*/*",
     "https://*/",
     "https://*/*",
     "http://*/",

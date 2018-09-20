@@ -141,7 +141,7 @@ h3 {
 .test-code {
   position: relative;
 }
-.App button, .App input, .App select {
+.App .btn, .App input, .App select {
   margin-right: 5px;
   margin-bottom: 5px;
 }
@@ -274,5 +274,9 @@ a, button {
 }
 input[type='file'].save-events-sess {
   margin-left: 5px;
+  display: inline-block;
+}
+.back-btn {
+  margin-top: 10px;
   display: inline-block;
 }
