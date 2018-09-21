@@ -290,3 +290,18 @@ input[type='file'].save-events-sess {
 input.dim {
   width: 50px;
 }
+.node-sel {
+  position: relative;
+  display: inline-block;
+  margin-right: 5px;
+}
+.node-sel input {
+  padding-right: 30px;
+  margin-right: 0;
+}
+.node-sel button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 0 !important;
+}

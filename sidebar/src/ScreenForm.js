@@ -29,6 +29,7 @@ export default class ScreenForm extends Component {
         });
     };
     nodeChange = (e) => {
+        e.preventDefault();
         if (!this.selectorUpdate) {
             var screen = {node: e.target.value, image: this.state.screen.image};
             this.setState({screen: screen});
@@ -66,7 +67,10 @@ export default class ScreenForm extends Component {
                     <label htmlFor={`sbAddEventScreen${this.key}${this.parentKey}`}>Add a Screen: </label>
                 </div>
                 <div className="col-xs-12 col-sm-6 col-md-8 col-lg-8">
-                    <input name="node" title="CSS Selector of Element" placeholder="Element" className="screen-node input-sm" id={`sbAddEventScreen${this.key}${this.parentKey}`} onChange={this.nodeChange.bind(this)} onClick={this.selectorChange} value={node}></input>
+                    <div className="node-sel">
+                        <input name="node" title="CSS Selector of Element" placeholder="Element" className="screen-node input-sm" id={`sbAddEventScreen${this.key}${this.parentKey}`} onChange={this.nodeChange.bind(this)} value={node}></input>
+                        <button onClick={this.nodeChange} className="btn btn-secondary btn-sm glyphicon glyphicon-import"></button>
+                    </div>
                     {this.getImage(image)}
                     <button className="btn btn-sm btn-primary" data-index={this.key} onClick={this.takeScreenShot}>Take Screen</button>
                     <button className="btn btn-sm btn-primary" data-index={this.key} onClick={this.removeScreen}>Remove Screen</button>

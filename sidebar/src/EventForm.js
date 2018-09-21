@@ -51,6 +51,7 @@ export default class EventForm extends Component {
         e.preventDefault();
     };
     selectNodeFromBrowser = (e) => {
+        e.preventDefault();
         var that = this;
         Utils.getSelector(function (res) {
             that.selectorUpdate = true;
@@ -80,7 +81,10 @@ export default class EventForm extends Component {
                     <label htmlFor={`sbAddEvent${this.key}`}>Select an Event: </label>
                 </div>
                 <div className="col-xs-12 col-sm-6 col-md-8 col-lg-8">
-                    <input name="eventNode" onClick={this.selectNodeFromBrowser} title="CSS Selector of Element" placeholder="Element" className="event-node input-sm" id={`sbAddEvent${this.key}`} onChange={this.selectorChange} value={event.node}></input>
+                    <div className="node-sel">
+                        <input name="eventNode" title="CSS Selector of Element" placeholder="Element" className="event-node input-sm" id={`sbAddEvent${this.key}`} onChange={this.selectorChange} value={event.node}></input>
+                        <button onClick={this.selectNodeFromBrowser} className="btn btn-secondary btn-sm glyphicon glyphicon-import"></button>
+                    </div>
                     <select className="input-sm" defaultValue={event.event} onChange={this.eventChange}>
                         <option value="0">PageLoad</option>
                         <option value="1">Click</option>

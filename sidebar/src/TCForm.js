@@ -148,7 +148,7 @@ export default class TCForm extends Component {
         return listItems;
     };
     runAllEvents = (e) => {
-        // Utils.runEvents(this.events);
+        Utils.runEvents(this.state.events);
         e.preventDefault();
     };
     setDataAfterValidation = (strData) => {
