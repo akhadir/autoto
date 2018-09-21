@@ -175,10 +175,14 @@ export default class TCForm extends Component {
         };
         reader.readAsText(file);
     };
+    refreshState = () => {
+        var events = JSON.parse(JSON.stringify(this.state.events));
+        this.setState( {"events": events });
+    };
     downloadButton = () => {
         var dataStr = 'data:application/json;charset=utf-8,' + escape(JSON.stringify(this.state.events, null, 4)),
             out = (
-                <a href={dataStr} download="config" className="save-events-sess btn btn-sm btn-primary" title="Save this to a file">Save</a>
+                <a href={dataStr} download="config" onClick={this.refreshState} className="save-events-sess btn btn-sm btn-primary" title="Save this to a file">Save</a>
             );
         return out;
     };
