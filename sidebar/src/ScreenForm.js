@@ -20,6 +20,7 @@ export default class ScreenForm extends Component {
         }
     };
     selectorChange = (e) => {
+        e.preventDefault();
         var that = this;
         Utils.getSelector(function (val) {
             that.selectorUpdate = true;
@@ -69,7 +70,7 @@ export default class ScreenForm extends Component {
                 <div className="col-xs-12 col-sm-6 col-md-8 col-lg-8">
                     <div className="node-sel">
                         <input name="node" title="CSS Selector of Element" placeholder="Element" className="screen-node input-sm" id={`sbAddEventScreen${this.key}${this.parentKey}`} onChange={this.nodeChange.bind(this)} value={node}></input>
-                        <button onClick={this.nodeChange} className="btn btn-secondary btn-sm glyphicon glyphicon-import"></button>
+                        <button onClick={this.selectorChange} className="btn btn-secondary btn-sm glyphicon glyphicon-import"></button>
                     </div>
                     {this.getImage(image)}
                     <button className="btn btn-sm btn-primary" data-index={this.key} onClick={this.takeScreenShot}>Take Screen</button>
