@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import AssertionForm from './AssertionForm';
 import EventForm from './EventForm';
 import ScreenForm from './ScreenForm';
 import Utils from './Utils';
@@ -15,7 +16,8 @@ export default class TCForm extends Component {
             event: 0,
             evalue: '',
             timer: props.settings.eventTimer,
-            screens: []
+            screens: [],
+            assertions: []
         }];
         this.state.events = events;
         this.updateURL(events);
@@ -40,7 +42,8 @@ export default class TCForm extends Component {
                 event: 1,
                 evalue: '',
                 timer: this.props.settings.eventTimer,
-                screens: []
+                screens: [],
+                assertions: []
             };
         events.splice(index + 1, 0, event);
         this.setState({events: events});
@@ -60,6 +63,12 @@ export default class TCForm extends Component {
         var events = JSON.parse(JSON.stringify(this.state.events));
         var eventScreens = events[eventIndex].screens;
         eventScreens.splice(screenIndex, 1);
+        this.setState({events: events});
+    };
+    removeAssertion = (eventIndex, aIndex) => {
+        var events = JSON.parse(JSON.stringify(this.state.events));
+        var assertions = events[eventIndex].assertions;
+        assertions.splice(aIndex, 1);
         this.setState({events: events});
     };
     removeEvent = (eventIndex) => {
@@ -86,6 +95,18 @@ export default class TCForm extends Component {
             return (
                 <div className="row form-control-static" key={`${index}${key}`} data-index={`${index}${key}`}>
                 <ScreenForm settings={settings} screen={value} index={key} pindex={index} remove={that.removeScreen.bind(that)}></ScreenForm>
+                </div>
+            );
+        });
+        return listItems;
+    };
+    assertions = (index) => {
+        var settings = this.props.settings,
+            that = this,
+        listItems = this.state.events[index].assertions.map(function(value, key) {
+            return (
+                <div className="row form-control-static" key={`${index}${key}`} data-index={`${index}${key}`}>
+                <AssertionForm settings={settings} assertion={value} index={key} pindex={index} remove={that.removeAssertion.bind(that)}></AssertionForm>
                 </div>
             );
         });
@@ -125,7 +146,18 @@ export default class TCForm extends Component {
         }
         return out;
     };
-    eventScreens = () => {
+    addAssertions = (e) => {
+        e.preventDefault();
+        var index = e.target.attributes['data-index'].value,
+            events = Object.assign([], this.state.events);
+        events[index].assertions.push({
+            node: '',
+            assertType: '',
+            value: ''
+        });
+        this.setState({events: events});
+    };
+    eventAssertions = () => {
         var settings = this.props.settings,
             that = this;
         var listItems = this.state.events.map(function(value, key) {
@@ -139,6 +171,10 @@ export default class TCForm extends Component {
                     {that.screens(key)}
                     <div className='screen-control'>
                         <button className="screen-event btn btn-sm btn-secondary" onClick={that.addEventScreen} data-index={key}>+ Add Screen</button>
+                    </div>
+                    {that.assertions(key)}
+                    <div className='assertion-control'>
+                        <button className="add-assert btn btn-sm btn-secondary" onClick={that.addAssertions} data-index={key}>+ Add Assertion</button>
                     </div>
                 </div>
                 <button className="btn btn-sm btn-secondary" onClick={that.addExtraEvent} data-index={key}>+ Add Event Here</button>
@@ -216,7 +252,7 @@ export default class TCForm extends Component {
                         </div>
                         </div>
                         <div className="form-control-static">
-                        {this.eventScreens()}
+                        {this.eventAssertions()}
                         </div>
                         <div className="form-control-static">
                             <button className="run-events btn btn-sm btn-default" onClick={this.runAllEvents}>Run All Events</button>

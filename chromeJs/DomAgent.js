@@ -36,6 +36,12 @@
             else if (type === 'DATA_REQ_SCREEN_SHOT') {
                 DomWorker.getScreen(request);
             }
+            else if (type === 'DATA_REQ_INNER_TEXT') {
+                DomWorker.getInnerText(request);
+            }
+            else if (type === 'DATA_REQ_NODE_COUNT') {
+                DomWorker.getNodeCount(request);
+            }
             else if (type === 'DATA_REQ_WINDOW_URL') {
                 DomWorker.getInspWindowURL(request);
             }
@@ -93,6 +99,36 @@
     };
     var ajaxCalls = {};
     var DomWorker = {
+        getInnerText: function (req) {
+            var node = req.root,
+                code = "winOver.getInnerText('" + node + "')";
+            chrome.devtools.inspectedWindow.eval(code, {
+                "useContentScriptContext": true
+            }, function (result, isException) {
+                if (!isException) {
+                    req.callback(result);
+                }
+                else {
+                    console.log(code);
+                    console.log("Exception: " + JSON.stringify(isException));
+                }
+            });
+        },
+        getNodeCount: function (req) {
+            var node = req.root,
+                code = "winOver.getNodeCount('" + node + "')";
+            chrome.devtools.inspectedWindow.eval(code, {
+                "useContentScriptContext": true
+            }, function (result, isException) {
+                if (!isException) {
+                    req.callback(result);
+                }
+                else {
+                    console.log(code);
+                    console.log("Exception: " + JSON.stringify(isException));
+                }
+            });
+        },
         getInspWindowViewPort: function (req) {
             var code = "winOver.getViewport()";
             chrome.devtools.inspectedWindow.eval(code, {

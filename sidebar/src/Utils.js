@@ -28,7 +28,13 @@ export default class Utils {
         window.RunEvents.runAll(events);
     };
     static getInsWindowURL = (callback) => {
-        window.DomAgent.process({type: "DATA_REQ_WINDOW_URL", root: root, callback: callback});
+        window.DomAgent.process({type: "DATA_REQ_WINDOW_URL", callback: callback});
+    };
+    static getInnerText = (node, callback) => {
+        window.DomAgent.process({type: "DATA_REQ_INNER_TEXT", root: node, callback: callback});
+    };
+    static getNodeCount = (node, callback) => {
+        window.DomAgent.process({type: "DATA_REQ_NODE_COUNT", root: node, callback: callback});
     };
     static getViewPort = (callback) => {
         window.DomAgent.process({type: "DATA_REQ_WINDOW_VIEWPORT", callback: function (result) {

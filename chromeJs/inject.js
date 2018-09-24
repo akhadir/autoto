@@ -226,6 +226,12 @@ var winOver;
         },
         getViewport: function () {
             return JSON.stringify({"width": window.innerWidth, "height": window.innerHeight});
+        },
+        getInnerText: function (node) {
+            return $(node)[0].innerText;
+        },
+        getNodeCount: function (node) {
+            return $(node).length;
         }
     };
     var dispatcherEvent = function (target, ...args) {
