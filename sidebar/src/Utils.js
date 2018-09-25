@@ -90,7 +90,9 @@ export default class Utils {
         "RightClick",
         "DoubleClick",
         "Submit",
-        "NetworkIdle"];
+        "NetworkIdle",
+        "ElementVisible",
+        "ElementHidden"];
         return list;
     };
     static getAssertionList = () => {

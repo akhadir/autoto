@@ -21,17 +21,37 @@ export default class CopyTC extends Component {
     };
     getSimulateEvent = (event) => {
         var eventName,
-            node,
+            node = event.node,
             setValStmt,
             out = '';
-        if (event.event !== 0) {
-            node = event.node;
-            eventName = this.eventOptions[event.event];
-            setValStmt = '';
-            if (event.evalue) {
-                setValStmt = `target.value = "${event.evalue}";`
-            }
-            return (`
+        switch (event.event) {
+            case 0:
+                out = (`
+        await page.waitForNavigation({timeout: 0, waitUntil: 'load'});
+                `);
+                break;
+            case 12:
+                out = (`
+        await page.waitForNavigation({timeout: 0, waitUntil: 'networkidle0'});
+                `);
+                break;
+            case 13:
+                out = (`
+        await page.waitForSelector('${node}', {timeout: 0, visible: true});
+                `);
+                break;
+            case 14:
+                out = (`
+        await page.waitForSelector('${node}', {timeout: 0, hidden: true});
+                `);
+                break;
+            default:
+                eventName = this.eventOptions[event.event];
+                setValStmt = '';
+                if (event.evalue) {
+                    setValStmt = `target.value = "${event.evalue}";`
+                }
+                out = (`
         await evaluate(function () {
             var target = document.querySelector("${node}"),
             e = document.createEvent("Event");
@@ -39,7 +59,8 @@ export default class CopyTC extends Component {
             target.dispatchEvent(e);
             ${setValStmt}
         }, null);
-            `);
+                    `);
+                break;
         }
         return out;
     };
@@ -100,8 +121,8 @@ export default class CopyTC extends Component {
 */
 // global puppeteer, browser, page, expect;
 describe('Spec to test - "${URL}"', function () {
+    this.timeout(0);
     before(async function () {
-        this.timeout(0);
         this.enableTimeouts(false);
         if (!puppeteer) {
             puppeteer = require('puppeteer');
