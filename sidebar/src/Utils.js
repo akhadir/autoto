@@ -1,9 +1,14 @@
 if (!window.DomAgent) {
     window.DomAgent = {process: function () {
-        if (arguments[0].type === 'DATA_REQ_WINDOW_URL') {
+        var type = arguments[0].type;
+        if (type === 'DATA_REQ_WINDOW_URL') {
             arguments[0].callback(window.location.href);
-        } else if (arguments[0].type === 'DATA_REQ_WINDOW_VIEWPORT') {
+        } else if (type === 'DATA_REQ_WINDOW_VIEWPORT') {
             arguments[0].callback(JSON.stringify({"width": window.innerWidth, "height": window.innerHeight}));
+        } else if (type === 'DATA_REQ_INNER_TEXT') {
+            arguments[0].callback("abcd");
+        } else if (type === 'DATA_REQ_NODE_COUNT') {
+            arguments[0].callback("10");
         }
     }};
 }
@@ -40,7 +45,7 @@ export default class Utils {
         window.DomAgent.process({type: "DATA_REQ_WINDOW_VIEWPORT", callback: function (result) {
             callback(JSON.parse(result));
         }});
-    }
+    };
     static cropImageToRect = (res, callback) => {
         var imgURL = res.image,
             rect = res.clip,
@@ -70,5 +75,30 @@ export default class Utils {
             callback(canvas1.toDataURL("image/png"));
         }
         img.src = imgURL;
+    };
+    static getEventsList = () => {
+        var list = [
+        "PageLoad",
+        "Click",
+        "Change",
+        "Hover",
+        "KeyPress",
+        "KeyUp",
+        "KeyDown",
+        "Focus",
+        "Blur",
+        "RightClick",
+        "DoubleClick",
+        "Submit",
+        "NetworkIdle"];
+        return list;
+    };
+    static getAssertionList = () => {
+        var list = [
+            "Available",
+            "Node Count",
+            "Inner Text",
+        ];
+        return list;
     }
 }

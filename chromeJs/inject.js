@@ -93,7 +93,7 @@ var winOver;
             return out;
         },
         getSelector: function (node, root, usi, maxDepth) {
-            var self = this, out = "", nindex, index = 0, rootNode, parents;
+            var self = this, out = "", nindex, index = 0, rootNode, parents, parent;
             try {
                 if ($) {
                     parents = $(node).parents("[id]");
@@ -121,6 +121,9 @@ var winOver;
                             return false;
                         }
                     });
+                    if (usi) {
+                        out += self.getParentClass($(node)[0]) + ' ';
+                    }
                 }
                 else {
                     throw "JQUERY INJECT IS NOT WORKING";
@@ -138,6 +141,18 @@ var winOver;
             nindex = self.getNodeIndex(node, rootNode, out);
             if (nindex > -1) {
                 out += ":nth(" + nindex + ")";
+            }
+            return out;
+        },
+        getParentClass: function (node) {
+            var parent = $(node).parent(),
+                out = '';
+            if (parent.length && !parent[0].id) {
+                if (parent[0].className) {
+                    out = '.' + parent[0].className.trim().replace(/\s+/g, '.');
+                } else {
+                    out = this.getParentClass(parent[0]);
+                }
             }
             return out;
         },
@@ -240,4 +255,4 @@ var winOver;
         target.dispatchEvent(e);
     };
 })();
-//# sourceMappingURL=inject.js.map
+//# sourceRunpingURL=inject.js.Run

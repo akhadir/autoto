@@ -73,6 +73,17 @@ export default class EventForm extends Component {
         }
         return buttons;
     };
+    getEventsDropdown = (event) => {
+        var options = Utils.getEventsList(),
+        optionsHTML = options.map(function(value, key) {
+            return (<option value={key} key={key}>{value}</option>);
+        });
+        return (
+            <select className="input-sm" value={event} onChange={this.eventChange}>
+            {optionsHTML}
+            </select>
+        );
+    };
     render = () => {
         var event = this.state.event;
         return (
@@ -85,20 +96,7 @@ export default class EventForm extends Component {
                         <input name="eventNode" title="CSS Selector of Element" placeholder="Element" className="event-node input-sm" id={`sbAddEvent${this.key}`} onChange={this.selectorChange} value={event.node}></input>
                         <button onClick={this.selectNodeFromBrowser} className="btn btn-secondary btn-sm glyphicon glyphicon-import"></button>
                     </div>
-                    <select className="input-sm" defaultValue={event.event} onChange={this.eventChange}>
-                        <option value="0">PageLoad</option>
-                        <option value="1">Click</option>
-                        <option value="2">Change</option>
-                        <option value="3">Hover</option>
-                        <option value="4">KeyPress</option>
-                        <option value="5">KeyUp</option>
-                        <option value="6">KeyDown</option>
-                        <option value="7">Focus</option>
-                        <option value="8">Blur</option>
-                        <option value="9">RightClick</option>
-                        <option value="10">DoubleClick</option>
-                        <option value="11">Submit</option>
-                    </select>
+                    {this.getEventsDropdown(event.event)}
                     <input type="text" name="evalue" className="evalue input-sm" onChange={this.valueChange} value={event.evalue} placeholder="Value If Any" title="Value to be added to selected element"></input>
                     <input type="number" min="0" max="15" name="timer" className="timer input-sm" value={event.timer} onChange={this.changeEventTimer} size="2" max-length="2" title="Timer in Seconds" placeholder="Timer"></input>
                     {this.controlButtons()}

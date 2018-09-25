@@ -8,6 +8,7 @@ export default class TCForm extends Component {
     state = {events: [], msg: ''};
     props: any;
     file: any;
+    setState: any;
     constructor(props) {
         super(props);
         var events = [{
@@ -152,7 +153,7 @@ export default class TCForm extends Component {
             events = Object.assign([], this.state.events);
         events[index].assertions.push({
             node: '',
-            assertType: '',
+            assertType: 0,
             value: ''
         });
         this.setState({events: events});
@@ -217,8 +218,12 @@ export default class TCForm extends Component {
     };
     downloadButton = () => {
         var dataStr = 'data:application/json;charset=utf-8,' + escape(JSON.stringify(this.state.events, null, 4)),
+            // tcStr = 'data:application/javascript;charset=utf-8,' + '',
             out = (
-                <a href={dataStr} download="config" onClick={this.refreshState} className="save-events-sess btn btn-sm btn-primary" title="Save this to a file">Save</a>
+                <React.Fragment>
+                <a href={dataStr} download="config" onClick={this.refreshState} className="save-events-sess btn btn-sm btn-primary" title="Save configuration to a file">Save</a>
+                {/* <a href={tcStr} download="testcase" onClick={this.copyAction} className="save-events-sess btn btn-sm btn-primary" title="Save testcases to a file">Save TC</a> */}
+                </React.Fragment>
             );
         return out;
     };

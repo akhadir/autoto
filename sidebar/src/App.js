@@ -6,6 +6,10 @@ import TCForm from './TCForm';
 import CopyForm from './CopyForm';
 class App extends Component {
     state = {formState: 0};
+    settings: { eventTimer: number; };
+    data: {};
+    settingsComp: any;
+    setState: any;
     constructor(props) {
         super(props);
         this.settings = {eventTimer: 10};
@@ -24,18 +28,16 @@ class App extends Component {
     };
     backAction = (e) => {
         this.setState({ formState: 0});
-        this.saveSettings.formState = 0;
         e.preventDefault();
     };
     showCopyForm = (data) => {
         this.data = data;
         this.setState({ formState: 2});
-        this.saveSettings.formState = 2;
     };
     
     getCopyForm = () => {
       var out = '';
-      if (this.saveSettings.formState === 2) {
+      if (this.state.formState === 2) {
           out = (
             <React.Fragment>
               <a className="back-btn" onClick={this.backAction}><span className="glyphicon glyphicon-arrow-left"></span></a>
