@@ -33,12 +33,12 @@ export default class CopyTC extends Component {
             }
             return (`
         await evaluate(function () {
-            var target = $("${node}"),
+            var target = document.querySelector("${node}"),
             e = document.createEvent("Event");
             e.initEvent.apply(e, ['${eventName}', true ,true]);
             target.dispatchEvent(e);
             ${setValStmt}
-        });
+        }, null);
             `);
         }
         return out;
@@ -54,16 +54,16 @@ export default class CopyTC extends Component {
             switch (assertType) {
                 case 0:
                     assertStr = `Check for the availability of the node "${node}"`;
-                    assertValStmt = `var val = await page.evaluate("$('${node}').length"');`;
+                    assertValStmt = `var val = await page.evaluate("document.querySelectorAll('${node}').length");`;
                     assertVal = '1';
                     break;
                 case 1:
                     assertStr = `"${node}" should be equal to count "${assertVal}"`;
-                    assertValStmt = `var val = await page.evaluate("$('${node}').length"');`;
+                    assertValStmt = `var val = await page.evaluate("document.querySelectorAll('${node}').length");`;
                     break;
                 case 2:
                     assertStr = `"${node}" should be equal to "${assertVal}"`;
-                    assertValStmt = `var val = await page.evaluate("$('${node}').text()"); val = val.trim();`;
+                    assertValStmt = `var val = await page.evaluate("document.querySelector('${node}').innerText"); val = val.trim();`;
                     break;
                 default:
             }
@@ -96,9 +96,9 @@ export default class CopyTC extends Component {
         return (`
 /**
 * @description 
-* 
+* @author Auto generated document
 */
-// global puppeteer, browser, page;
+// global puppeteer, browser, page, expect;
 describe('Spec to test - "${URL}"', function () {
     before(async function () {
         this.timeout(0);
@@ -111,6 +111,9 @@ describe('Spec to test - "${URL}"', function () {
         }
         if (!page) {
             page = await browser.newPage();
+        }
+        if (!expect) {
+            expect = require('chai').expect;
         }
         await page.setExtraHTTPHeaders({
             'Accept-Language': 'en-GB,en-US;q=0.9,en;q=0.8'

@@ -65,12 +65,19 @@ export default class AssertionForm extends Component {
         var that = this,
             type = parseInt(e.target.value, 10),
             node = this.state.assertion.node;
-        if (type === 2) {
-            Utils.getInnerText(node, set);
-        } else if (type === 1) {
-            Utils.getNodeCount(node, set);
-        } else {
-            set(this.state.assertion.value);
+        switch (type) {
+            case 2:
+                Utils.getInnerText(node, set);
+            break;
+            case 1:
+                node = node.replace(/:nth\(\d+\)$/, '');
+                Utils.getNodeCount(node, set);
+                break;
+            case 0:
+                set(this.state.assertion.value);
+                break;
+            default:
+                break;
         }
         function set(value) {
             value += '';
@@ -79,6 +86,7 @@ export default class AssertionForm extends Component {
             that.setState({assertion: assertion});
             that.props.assertion.assertType = assertion.assertType;
             that.props.assertion.value = assertion.value;
+            that.props.assertion.node = assertion.node;
         }
     };
     valueChange = (e) => {
