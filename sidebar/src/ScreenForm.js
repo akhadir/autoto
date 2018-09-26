@@ -65,7 +65,7 @@ export default class ScreenForm extends Component {
         return (
             <React.Fragment>
                 <div className="col-xs-12 col-sm-6 col-md-8 col-lg-8">
-                    <label htmlFor={`sbAddEventScreen${this.key}${this.parentKey}`}>Add a Screen: </label>
+                    <label htmlFor={`sbAddEventScreen${this.key}${this.parentKey}`}>Add Screen - Assertion: </label>
                 </div>
                 <div className="col-xs-12 col-sm-6 col-md-8 col-lg-8">
                     <div className="node-sel">

@@ -171,7 +171,7 @@ export default class TCForm extends Component {
                     </div>
                     {that.screens(key)}
                     <div className='screen-control'>
-                        <button className="screen-event btn btn-sm btn-secondary" onClick={that.addEventScreen} data-index={key}>+ Add Screen Assertion</button>
+                        <button className="screen-event btn btn-sm btn-secondary" onClick={that.addEventScreen} data-index={key}>+ Add Screen</button>
                     </div>
                     {that.assertions(key)}
                     <div className='assertion-control'>
