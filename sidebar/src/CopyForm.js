@@ -19,12 +19,13 @@ export default class CopyForm extends Component {
     }
     copyText = () => {
         var data = JSON.stringify(this.data, null, 4);
-        this.confStr = 'data:application/javascript;charset=utf-8,' + escape(data);
+        this.confStr = 'data:application/json;charset=utf-8,' + escape(data);
         return data;
     };
     copyTextURI = (e) => {
         var data = JSON.stringify(this.data, null, 4);
-        this.confStr = 'data:application/javascript;charset=utf-8,' + escape(data);
+        this.confStr = 'data:application/json;charset=utf-8,' + escape(data);
+        this.forceUpdate();
     };
 
     copyAction = (e) => {
