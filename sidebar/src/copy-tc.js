@@ -1,6 +1,5 @@
 import { Component } from 'react';
-import Utils from './Utils';
-// import Utils from './Utils';
+import Utils from './util';
 
 export default class CopyTC extends Component {
     data: any;

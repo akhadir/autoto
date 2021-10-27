@@ -1,10 +1,11 @@
-import React, { Component } from 'react';
-import AssertionForm from './AssertionForm';
-import EventForm from './EventForm';
-import ScreenForm from './ScreenForm';
-import Utils from './Utils';
+import React from 'react';
+import AssertionForm from './assertion-form';
+import EventGrabber from './event-grabber';
+import EventForm from './event-form';
+import ScreenForm from './screen-form';
+import Utils from './util';
 
-export default class TCForm extends Component {
+export default class TCForm extends React.Component {
     state = {events: [], msg: ''};
     props: any;
     file: any;
@@ -164,21 +165,20 @@ export default class TCForm extends Component {
         var listItems = this.state.events.map(function(value, key) {
             return (
                 <React.Fragment key={key}>
-                {that.getViewportForm(value, key)}
-                <div className='event-screen'>
-                    <div className="row form-control-static" data-index={key}>
-                        <EventForm settings={settings} index={key} event={value} remove={that.removeEvent.bind(that)}></EventForm>
+                    <div className='event-screen'>
+                        <div className="row form-control-static" data-index={key}>
+                            <EventForm settings={settings} index={key} event={value} remove={that.removeEvent.bind(that)}></EventForm>
+                        </div>
+                        {that.screens(key)}
+                        <div className='screen-control'>
+                            <button className="screen-event btn btn-sm btn-secondary" onClick={that.addEventScreen} data-index={key}>+ Add Screen</button>
+                        </div>
+                        {that.assertions(key)}
+                        <div className='assertion-control'>
+                            <button className="add-assert btn btn-sm btn-secondary" onClick={that.addAssertions} data-index={key}>+ Add Assertion</button>
+                        </div>
                     </div>
-                    {that.screens(key)}
-                    <div className='screen-control'>
-                        <button className="screen-event btn btn-sm btn-secondary" onClick={that.addEventScreen} data-index={key}>+ Add Screen</button>
-                    </div>
-                    {that.assertions(key)}
-                    <div className='assertion-control'>
-                        <button className="add-assert btn btn-sm btn-secondary" onClick={that.addAssertions} data-index={key}>+ Add Assertion</button>
-                    </div>
-                </div>
-                <button className="btn btn-sm btn-secondary" onClick={that.addExtraEvent} data-index={key}>+ Add Event Here</button>
+                    <button className="btn btn-sm btn-secondary" onClick={that.addExtraEvent} data-index={key}>+ Add Event Here</button>
                 </React.Fragment>
             );
         });
@@ -255,17 +255,19 @@ export default class TCForm extends Component {
                         <div className="col-xs-12 col-sm-6 col-md-8 col-lg-8">
                             <input type="file" id="loadEvents" className="btn btn-sm btn-primary" onChange={this.loadEvents}></input>
                         </div>
-                        </div>
-                        <div className="form-control-static">
+                    </div>
+                    {this.getViewportForm(this.state.events[0], 0)}
+                    <EventGrabber />
+                    <div className="form-control-static">
                         {this.eventAssertions()}
-                        </div>
-                        <div className="form-control-static">
-                            <button className="run-events btn btn-sm btn-default" onClick={this.runAllEvents}>Run All Events</button>
-                        </div>
-                        <div className="form-control-static center">
-                            <input type="submit" className="btn btn-sm btn-primary" onClick={this.copyAction} value="Copy Testcases"></input>
-                            {this.downloadButton()}
-                        </div>
+                    </div>
+                    <div className="form-control-static">
+                        <button className="run-events btn btn-sm btn-default" onClick={this.runAllEvents}>Run All Events</button>
+                    </div>
+                    <div className="form-control-static center">
+                        <input type="submit" className="btn btn-sm btn-primary" onClick={this.copyAction} value="Copy Testcases"></input>
+                        {this.downloadButton()}
+                    </div>
                 </form>
             </React.Fragment>
         );

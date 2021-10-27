@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import CopyTC from './CopyTC';
-// import Utils from './Utils';
+import CopyTC from './copy-tc';
 
 export default class CopyForm extends Component {
     forceUpdate: any;

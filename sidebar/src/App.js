@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
-import './App.css';
+import './app.css';
 import '../node_modules/bootstrap/dist/css/bootstrap.css';
-import Settings from './Settings';
-import TCForm from './TCForm';
-import CopyForm from './CopyForm';
+import Settings from './settings';
+import TCForm from './tc-form';
+import CopyForm from './copy-form';
 class App extends Component {
     state = {formState: 0};
-    settings: { eventTimer: number; };
-    data: {};
-    settingsComp: any;
-    setState: any;
+    settings = {};
+    data = {};
+    settingsComp;
+    setState;
     constructor(props) {
         super(props);
         this.settings = {eventTimer: 10};

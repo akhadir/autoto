@@ -13,10 +13,14 @@
   "author": "khadir.k@gmail.com",
   "license": "ISC",
   "devDependencies": {
-    "gulp": "^3.9.1",
+    "gulp": "^4.0.2",
     "gulp-clean": "^0.4.0",
     "gulp-rename": "^1.4.0",
     "gulp-run-command": "0.0.9",
     "run-sequence": "^2.2.1"
+  },
+  "dependencies": {
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   }
 }

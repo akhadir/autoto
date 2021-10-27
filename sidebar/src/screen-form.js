@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Utils from './Utils';
+import Utils from './util';
 export default class ScreenForm extends Component {
     state = {screen: null};
     constructor(props) {

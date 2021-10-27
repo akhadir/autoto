@@ -1,8 +1,9 @@
-import React, { Component } from 'react';
-import Utils from './Utils';
+import React from 'react';
+import Utils from './util';
+export default class EventForm extends React.Component {
+    state =  { event: null };
+    settings;
 
-export default class EventForm extends Component {
-    state =  {event: null};
     constructor(props) {
         super(props);
         this.settings = props.settings;
