@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import NodeSelector from './components/node-selector';
 import Utils from './util';
 export default class AssertionForm extends Component {
     state = {assertion: null};
@@ -37,28 +38,13 @@ export default class AssertionForm extends Component {
             this.setState({assertion: this.props.assertion});
         }
     };
-    selectorChange = (e) => {
-        e.preventDefault();
-        var that = this;
-        Utils.getSelector(function (val) {
-            that.selectorUpdate = true;
-            var assertion = {node: val, value: '', assertType: 0};
-            that.setState({assertion: assertion});
-            that.props.assertion.node = assertion.node;
-            that.props.assertion.value = assertion.value;
-            that.props.assertion.assertType = assertion.assertType;
-        });
-    };
-    nodeChange = (e) => {
-        e.preventDefault();
-        if (!this.selectorUpdate) {
-            var assertion = {node: e.target.value, value: '', assertType: 0};
-            this.setState({assertion: assertion});
-            this.props.assertion.node = assertion.node;
-            this.props.assertion.value = assertion.value;
-            this.props.assertion.assertType = assertion.assertType;
-        }
-        this.selectorUpdate = false;
+    selectorChange = function (val) {
+        let that = this;
+        let assertion = {node: val, value: '', assertType: 0};
+        that.setState({assertion: assertion});
+        that.props.assertion.node = assertion.node;
+        that.props.assertion.value = assertion.value;
+        that.props.assertion.assertType = assertion.assertType;
     };
     assertTypeChange = (e) => {
         e.preventDefault();
@@ -105,20 +91,17 @@ export default class AssertionForm extends Component {
             assertType = assertion.assertType,
             value = assertion.value;
         return (
-            <React.Fragment>
+            <div>
                 <div className="col-xs-12 col-sm-6 col-md-8 col-lg-8">
                     <label htmlFor={`sbAddAssertion${this.key}${this.parentKey}`}>Add Assertion: </label>
                 </div>
                 <div className="col-xs-12 col-sm-6 col-md-8 col-lg-8"  id={`sbAddAssertion${this.key}${this.parentKey}`}>
-                    <div className="node-sel">
-                        <input name="node" title="CSS Selector of Element" placeholder="Element" className="assertion-node input-sm" onChange={this.nodeChange.bind(this)} value={node}></input>
-                        <button onClick={this.selectorChange} className="btn btn-secondary btn-sm glyphicon glyphicon-import"></button>
-                    </div>
+                    <NodeSelector onChange={this.selectorChange.bind(this)} value={node} />
                     {this.getAssertionDropdown(assertType)}
                     <input name="value" title="Value" placeholder="Value (can be auto-generated)" className="assertion-node input-sm" onChange={this.valueChange.bind(this)} value={value}></input>
                     <button className="btn btn-sm btn-primary" data-index={this.key} onClick={this.removeAssertion}>Remove Assertion</button>
                 </div>
-            </React.Fragment>
+            </div>
         );
     };
 }

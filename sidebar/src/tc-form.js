@@ -164,7 +164,7 @@ export default class TCForm extends React.Component {
             that = this;
         var listItems = this.state.events.map(function(value, key) {
             return (
-                <React.Fragment key={key}>
+                <div key={key}>
                     <div className='event-screen'>
                         <div className="row form-control-static" data-index={key}>
                             <EventForm settings={settings} index={key} event={value} remove={that.removeEvent.bind(that)}></EventForm>
@@ -177,9 +177,12 @@ export default class TCForm extends React.Component {
                         <div className='assertion-control'>
                             <button className="add-assert btn btn-sm btn-secondary" onClick={that.addAssertions} data-index={key}>+ Add Assertion</button>
                         </div>
+                        <div className='assertion-control'>
+                            <button className="add-assert btn btn-sm btn-secondary" onClick={that.addAssertions} data-index={key}>+ Add HTML Snapshot</button>
+                        </div>
                     </div>
                     <button className="btn btn-sm btn-secondary" onClick={that.addExtraEvent} data-index={key}>+ Add Event Here</button>
-                </React.Fragment>
+                </div>
             );
         });
         return listItems;
@@ -232,7 +235,7 @@ export default class TCForm extends React.Component {
             that = this;
         if (this.state.msg) {
             out = (
-                <div class="alert alert-info message">
+                <div className="alert alert-info message">
                     <strong>Info!</strong> {this.state.msg}
                 </div>
             );
@@ -244,7 +247,7 @@ export default class TCForm extends React.Component {
     };
     render = () => {
         return (
-            <React.Fragment>
+            <div>
                 <h4>Add TestCases</h4>
                 <form>
                     {this.showMessage()}
@@ -269,7 +272,7 @@ export default class TCForm extends React.Component {
                         {this.downloadButton()}
                     </div>
                 </form>
-            </React.Fragment>
+            </div>
         );
     };
 }
