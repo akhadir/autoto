@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import './app.css';
 import '../node_modules/bootstrap/dist/css/bootstrap.css';
-import Settings from './side-settings';
+import Settings from './settings';
 import TCForm from './tc-form';
 import CopyForm from './copy-form';
+
 class App extends Component {
     state = {formState: 0};
     settings = {};
