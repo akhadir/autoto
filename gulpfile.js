@@ -1,9 +1,8 @@
-var gulp = require('gulp'),
+const gulp = require('gulp'),
     clean = require('gulp-clean'),
     rename = require('gulp-rename'),
-    runSequnce = require('run-sequence'),
-    run = require('gulp-run-command');
-    
+    cleanCSS = require('gulp-clean-css'),
+    runCmd = require('gulp-run-command').default;
 
 gulp.task('clean', function() {
     return gulp.src(['dist/*'], {
@@ -11,18 +10,21 @@ gulp.task('clean', function() {
         })
         .pipe(clean());
 });
-gulp.task('build:sidebar', function () {
-    return run('cd sidebar; npm run build;');
+gulp.task('build:sidebar', async function () {
+    return runCmd(['npm run build'], {
+        env: { NODE_ENV: 'production' },
+        cwd: './sidebar',
+        // ignoreErrors: true
+    })();
 });
 gulp.task('build:panel', function () {
-    return run('cd panel; npm run panel;');
+    return runCmd(['npm run build'], {
+        env: { NODE_ENV: 'production' },
+        cwd: './panel',
+        // ignoreErrors: true
+    })();
 });
-gulp.task('child:sidebar', function () {
-    return runSequnce('copy:sidebar', 'update:sidebar');
-});
-gulp.task('child:panel', function () {
-    return runSequnce('copy:panel', 'update:panel');
-});
+
 gulp.task('copy:chromefiles', function() {
     gulp.src('./manifest.json')
         .pipe(gulp.dest('./dist/'));
@@ -32,42 +34,45 @@ gulp.task('copy:chromefiles', function() {
     .pipe(gulp.dest('./dist/'));
     gulp.src('./extJs/*.*')
     .pipe(gulp.dest('./dist/extJs/'));
-    gulp.src('./icon.png')
+    return gulp.src('./icon.png')
     .pipe(gulp.dest('./dist/'));
 });
 gulp.task('minify-css', function() {
-    gulp.src('dist/**/*.css')
-        .pipe(minifyCss())
+    return gulp.src('dist/**/*.css')
+        .pipe(cleanCSS())
         .pipe(gulp.dest("dist/"));
 });
 gulp.task('copy:sidebar', function() {
-    gulp.src('./sidebar/build/static/**/*.*')
+    return gulp.src('./sidebar/build/static/**/*.*')
         .pipe(gulp.dest('./dist/static/'));
 });
 gulp.task('update:sidebar', function() {
-    gulp.src('./sidebar/build/index.html')
+    return gulp.src('./sidebar/build/index.html')
         .pipe(rename('sidebar.html'))
         .pipe(gulp.dest('./dist/'));
 });
 gulp.task('update:panel', function() {
-    gulp.src('./panel/build/index.html')
+    return gulp.src('./panel/build/index.html')
         .pipe(rename('panel.html'))
         .pipe(gulp.dest('./dist/'));
 })
 gulp.task('copy:panel', function() {
-    gulp.src('./panel/build/static/**/*.*')
+    return gulp.src('./panel/build/static/**/*.*')
         .pipe(gulp.dest('./dist/static/'));
 });
 
-gulp.task('build', function() {
-    return runSequnce('clean','copy:chromefiles', 'build:sidebar', 'build:panel', 'child:sidebar', 'child:panel');
-});
+gulp.task('child:panel', gulp.series('copy:panel', 'update:panel'));
 
-gulp.task('dev:build', function() {
-    return runSequnce('clean','copy:chromefiles', 'child:sidebar', 'child:panel');
-});
+gulp.task('child:sidebar', gulp.series('copy:sidebar', 'update:sidebar'));
 
-gulp.task('default', ['build']);
+// Panel is no longer used
+// gulp.task('build', gulp.series('clean','copy:chromefiles', 'build:sidebar', 'build:panel', 'child:sidebar', 'child:panel'));
+gulp.task('build', gulp.series('clean','copy:chromefiles', 'build:sidebar', 'child:sidebar'));
+
+// build without running child npm
+gulp.task('dev:build', gulp.series('clean','copy:chromefiles', 'child:sidebar'));
+
+gulp.task('default', gulp.series('build'));
 
 /************
  * Watch
