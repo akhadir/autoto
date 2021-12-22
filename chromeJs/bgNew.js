@@ -4,7 +4,6 @@
     // As of now the complete listener is hardcoded for event-response
     // TODO: To make it support HAR and other requests as well
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-        console.log('response as req', request);
         ports[request.senderId].postMessage(request);
         return true;
     });
@@ -23,7 +22,6 @@
         port.onMessage.addListener(function(msg) {
             msg.senderId = senderId;
             // Received message from devtools. Do something:
-            console.log('Received message from devtools page', msg);
             sendMessageToTab(msg);
         });
     });
@@ -31,12 +29,16 @@
 
     // script to connect to Content script
     function sendMessageToTab(msg) {
-        chrome.tabs.sendMessage(
-            msg.tabId,
-            msg,
-            (response) => {
-                console.log("Message from the content script:", response);
-            }
-        );
+        try {
+            chrome.tabs.sendMessage(
+                msg.tabId,
+                msg,
+                (response) => {
+                    // console.log("Message from the content script:", response);
+                }
+            );
+        } catch(e) {
+            console.log('Window is not active', e);
+        }
     }
 })();

@@ -3,7 +3,6 @@ const GRAB_EVENTS = 'grab_events';
 const UNGRAB_EVENTS = 'ungrab_events';
 (function (DomAgents) {
     if (!DomAgents.DomAgent) {
-        console.log('Defining DomAgent');
         DomAgents.DomAgent = {
             sendMessage: undefined,
             reqIndex: 0,

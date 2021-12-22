@@ -8,16 +8,13 @@
     // });
     chrome.devtools.panels.elements.createSidebarPane("Autoto", function (sidebar) {
         tcSidebar = sidebar;
-        console.log('Initializing SideBar');
         sidebar.setPage("sidebar.html");
         let captureCB;
         var _window; // Going to hold the reference to sidebar.html's `window`
         // script to connect to background script
         var data = [];
-        console.log('Setting up port');
         var port = chrome.runtime.connect({name: 'devtools'});
         port.onMessage.addListener(function(msg) {
-            console.log('Captured', msg);
             if (captureCB) {
                 captureCB(msg);
             }
