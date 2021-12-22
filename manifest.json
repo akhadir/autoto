@@ -19,7 +19,7 @@
   ],
   "devtools_page": "devtools.html",
   "background": {
-    "scripts": ["chromeJs/bgNew.js"]
+    "scripts": ["chromeJs/bg-new.js"]
   },
 
   "permissions": [
