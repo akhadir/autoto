@@ -1,147 +1,154 @@
 "use strict";
+const GRAB_EVENTS = 'grab_events';
+const UNGRAB_EVENTS = 'ungrab_events';
 (function (DomAgents) {
-    DomAgents.DomAgent = {
-        reqIndex: 0,
-        loopFlag: true,
-        requestQueue: {},
-        pollString: "POLL_RES",
-        init: function (pollString) {
-            if (pollString) {
-                this.pollString = pollString;
-            }
-        },
-        process: function (request) {
-            var id, out, type = request.type;
-            if (type === 'DATA_REQ_SEL') {
-                DomWorker.getSelector(request);
-            }
-            else if (type === 'DATA_REQ_SEL_WITH_ROOT') {
-                DomWorker.getSelectorForce(request);
-            }
-            else if (type === 'DATA_REQ_SEL_CHILDREN') {
-                DomWorker.getChildren(request);
-            }
-            else if (type === 'DATA_REQ_PROPS') {
-                DomWorker.getProperties(request);
-            }
-            else if (type === 'DATA_REQ_OTHER_CALLS') {
-                DomWorker.getOtherCalls(request);
-            }
-            else if (type === 'DATA_REQ_AJAX_CALLS') {
-                DomWorker.getAjaxCalls(request);
-            }
-            else if (type === 'DATA_POST_EVENTS') {
-                DomWorker.postEvents(request);
-            }
-            else if (type === 'DATA_REQ_SCREEN_SHOT') {
-                DomWorker.getScreen(request);
-            }
-            else if (type === 'DATA_REQ_INNER_TEXT') {
-                DomWorker.getInnerText(request);
-            }
-            else if (type === 'DATA_REQ_NODE_COUNT') {
-                DomWorker.getNodeCount(request);
-            }
-            else if (type === 'DATA_REQ_WINDOW_URL') {
-                DomWorker.getInspWindowURL(request);
-            }
-            else if (type === 'DATA_REQ_WINDOW_VIEWPORT') {
-                DomWorker.getInspWindowViewPort(request);
-            }
-            else {
-                if (this.size(this.requestQueue) === 0) {
-                    this.reqIndex = 1;
-                    id = 0;
+    if (!DomAgents.DomAgent) {
+        console.log('Defining DomAgent');
+        DomAgents.DomAgent = {
+            sendMessage: undefined,
+            reqIndex: 0,
+            loopFlag: true,
+            requestQueue: {},
+            pollString: "POLL_RES",
+            init: function (pollString) {
+                if (pollString) {
+                    this.pollString = pollString;
+                }
+            },
+            process: function (request) {
+                var id, out, type = request.type;
+                if (type === 'DATA_REQ_SEL') {
+                    DomWorker.getSelector(request);
+                }
+                else if (type === 'DATA_REQ_SEL_WITH_ROOT') {
+                    DomWorker.getSelectorForce(request);
+                }
+                else if (type === 'DATA_REQ_SEL_CHILDREN') {
+                    DomWorker.getChildren(request);
+                }
+                else if (type === 'DATA_REQ_PROPS') {
+                    DomWorker.getProperties(request);
+                }
+                else if (type === 'DATA_REQ_OTHER_CALLS') {
+                    DomWorker.getOtherCalls(request);
+                }
+                else if (type === 'DATA_REQ_AJAX_CALLS') {
+                    DomWorker.getAjaxCalls(request);
+                }
+                else if (type === 'DATA_POST_EVENTS') {
+                    DomWorker.postEvents(request);
+                }
+                else if (type === 'DATA_REQ_SCREEN_SHOT') {
+                    DomWorker.getScreen(request);
+                }
+                else if (type === 'DATA_REQ_INNER_TEXT') {
+                    DomWorker.getInnerText(request);
+                }
+                else if (type === 'DATA_REQ_NODE_COUNT') {
+                    DomWorker.getNodeCount(request);
+                }
+                else if (type === 'DATA_REQ_WINDOW_URL') {
+                    DomWorker.getInspWindowURL(request);
+                }
+                else if (type === 'DATA_REQ_WINDOW_VIEWPORT') {
+                    DomWorker.getInspWindowViewPort(request);
                 }
                 else {
-                    id = this.reqIndex++;
+                    if (this.size(this.requestQueue) === 0) {
+                        this.reqIndex = 1;
+                        id = 0;
+                    }
+                    else {
+                        id = this.reqIndex++;
+                    }
+                    this.requestQueue[id] = request;
+                    out = this.clone(request);
+                    out.id = id;
+                    delete out.callback;
+                    this.run(out);
                 }
-                this.requestQueue[id] = request;
-                out = this.clone(request);
-                out.id = id;
-                delete out.callback;
-                this.run(out);
+            },
+            // new sendMessage replacing eval.
+            // TODO: Migrate all eval to sendMessage
+            grabEvents: function (evnts, captureCB) {
+                if (DomAgent.sendMessage) {
+                    DomAgent.sendMessage(chrome.devtools.inspectedWindow.tabId, GRAB_EVENTS, evnts, captureCB);
+                } else {
+                    console.log('BG Port not initialized');
+                }
+            },
+            ungrabEvents: function (evnts, captureCB) {
+                if (DomAgent.sendMessage) {
+                    DomAgent.sendMessage(chrome.devtools.inspectedWindow.tabId, UNGRAB_EVENTS, evnts, captureCB);
+                } else {
+                    console.log('BG Port not initialized');
+                }
+            },
+            run: function (options) {
+                var reqQ = this.requestQueue;
+                chrome.runtime.sendMessage(options, function (res) {
+                    var out;
+                    if (res && res.data) {
+                        out = res.data;
+                    }
+                    reqQ[options.id].callback(out);
+                    delete reqQ[options.id];
+                });
+            },
+            reset: function () {
+                this.requestQueue = {};
+                this.reqIndex = 0;
+            },
+            size: function (obj) {
+                var size = 0, key;
+                for (key in obj) {
+                    if (obj.hasOwnProperty(key)) {
+                        size++;
+                    }
+                }
+                return size;
+            },
+            clone: function (obj) {
+                var out = {}, key;
+                for (key in obj) {
+                    if (obj.hasOwnProperty(key)) {
+                        out[key] = obj[key];
+                    }
+                }
+                return out;
             }
-        },
-        run: function (options) {
-            var reqQ = this.requestQueue;
-            chrome.runtime.sendMessage(options, function (res) {
-                var out;
-                if (res && res.data) {
-                    out = res.data;
-                }
-                reqQ[options.id].callback(out);
-                delete reqQ[options.id];
-            });
-        },
-        reset: function () {
-            this.requestQueue = {};
-            this.reqIndex = 0;
-        },
-        size: function (obj) {
-            var size = 0, key;
-            for (key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    size++;
-                }
-            }
-            return size;
-        },
-        clone: function (obj) {
-            var out = {}, key;
-            for (key in obj) {
-                if (obj.hasOwnProperty(key)) {
-                    out[key] = obj[key];
-                }
-            }
-            return out;
+        };
+    }
+    var ajaxCalls = {};
+    const domCallback = function (result, isException, req, code) {
+        if (!isException) {
+            req.callback(result);
+        }
+        else {
+            console.log(code);
+            console.log("Exception: " + JSON.stringify(isException));
         }
     };
-    var ajaxCalls = {};
     var DomWorker = {
         getInnerText: function (req) {
             var node = req.root,
                 code = "winOver.getInnerText('" + node + "')";
             chrome.devtools.inspectedWindow.eval(code, {
                 "useContentScriptContext": true
-            }, function (result, isException) {
-                if (!isException) {
-                    req.callback(result);
-                }
-                else {
-                    console.log(code);
-                    console.log("Exception: " + JSON.stringify(isException));
-                }
-            });
+            }, (res, isException) => domCallback(res, isException, req, code));
         },
         getNodeCount: function (req) {
             var node = req.root,
                 code = "winOver.getNodeCount('" + node + "')";
             chrome.devtools.inspectedWindow.eval(code, {
                 "useContentScriptContext": true
-            }, function (result, isException) {
-                if (!isException) {
-                    req.callback(result);
-                }
-                else {
-                    console.log(code);
-                    console.log("Exception: " + JSON.stringify(isException));
-                }
-            });
+            }, (res, isException) => domCallback(res, isException, req, code));
         },
         getInspWindowViewPort: function (req) {
             var code = "winOver.getViewport()";
             chrome.devtools.inspectedWindow.eval(code, {
                 "useContentScriptContext": true
-            }, function (result, isException) {
-                if (!isException) {
-                    req.callback(result);
-                }
-                else {
-                    console.log(code);
-                    console.log("Exception: " + JSON.stringify(isException));
-                }
-            });
+            }, (res, isException) => domCallback(res, isException, req, code));
         },
         getInspWindowURL: function (req) {
             chrome.tabs.get(chrome.devtools.inspectedWindow.tabId, function(tab) {
@@ -349,21 +356,15 @@
             });
         },
         getOtherCalls: function (req) {
-            var dat = req.data, node = dat.dataNode, attr = dat.dataAttrib, code = "winOver.getOtherCalls('" + node + "', '" + attr + "')";
+            var dat = req.data,
+                node = dat.dataNode,
+                attr = dat.dataAttrib,
+                code = "winOver.getOtherCalls('" + node + "', '" + attr + "')";
             chrome.devtools.inspectedWindow.eval(code, {
                 "useContentScriptContext": true
-            }, function (result, isException) {
-                if (!isException) {
-                    if (req.callback) {
-                        req.callback(result);
-                    }
-                }
-                else {
-                    console.log(code);
-                    console.log("Exception: " + JSON.stringify(isException));
-                }
-            });
-        }
+            }, (res, isException) => domCallback(res, isException, req, code));
+        },
+        
     };
 })(window);
 //# sourceMappingURL=DomAgent.js.map

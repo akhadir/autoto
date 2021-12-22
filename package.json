@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "preinstall": "cd ./sidebar & npm i",
-    "build": "gulp build -LLLL"
+    "build": "gulp build -LLLL",
+    "quick-build": "gulp dev:build -LLLL"
   },
   "keywords": [
     "Automation"

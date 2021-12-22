@@ -95,6 +95,12 @@ export default class Utils {
         "ElementHidden"];
         return list;
     };
+    static grabEvents = (events, callback) => {
+        window.DomAgent.grabEvents(events, callback);
+    }
+    static ungrabEvents = (events, callback) => {
+        window.DomAgent.ungrabEvents(events, callback);
+    }
     static getAssertionList = () => {
         var list = [
             "Available",

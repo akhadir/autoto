@@ -13,7 +13,7 @@
     {
       "matches": ["http://*/*", "https://*/*"],
       "css": [],
-      "js": ["extJs/jquery.js", "extJs/html2canvas.js", "chromeJs/inject.js"],
+      "js": ["extJs/jquery.js", "extJs/html2canvas.js", "chromeJs/inject.js", "chromeJs/inject-new.js"],
       "run_at": "document_start"
     }
   ],

@@ -135,7 +135,7 @@ export default class TCForm extends React.Component {
                 <div className="viewport-screen">
                     <div className="row form-control-static">
                         <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-                            <label htmlFor='viewport'>Viewport: </label>
+                            <label htmlFor='viewport'>Viewport Dimensions: </label>
                         </div>
                         <div id='viewport' className="col-xs-12 col-sm-6 col-md-8 col-lg-8">
                             <input type="text" name="dimx" className="dim input-sm" onChange={this.dimWidthChange} value={value.dim.width}></input>
@@ -248,12 +248,12 @@ export default class TCForm extends React.Component {
     render = () => {
         return (
             <div>
-                <h4>Add TestCases</h4>
+                <h4>Add TestCases:</h4>
                 <form>
                     {this.showMessage()}
                     <div className="row form-control-static">
                         <div className="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-                            <label htmlFor="loadEvents">Load Testcases: </label>
+                            <label htmlFor="loadEvents">Load Testcases:</label>
                         </div>
                         <div className="col-xs-12 col-sm-6 col-md-8 col-lg-8">
                             <input type="file" id="loadEvents" className="btn btn-sm btn-primary" onChange={this.loadEvents}></input>

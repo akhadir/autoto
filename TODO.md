@@ -1,6 +1,6 @@
 # TODO
 * Integrate events with from Event Grab - Write util
-    + Create the event parser util file
+    + Create the event parser util file @done
     + Create the class which can convert events to model
     + Create the TC file
     + Sample data to support button click
@@ -15,7 +15,7 @@
     + Write the code
     + Integrate the code
     
-* Add Snapshop Assertion
+* Add Snapshot Assertion
     + Change Model to support snapshot assertion
     + Show UI with form for snap-shot
     + Show UI to grab parent node
