@@ -1,15 +1,14 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import useGrabEvent from './use-grab-event';
 
-export const EventGrabber = () => {
+export const EventGrabber = (props) => {
     const [grabStarted, setGrabStarted] = useState(false);
-    const { startGrab, stopGrab } = useGrabEvent(
-        {
-            captureCB: (e) => {
-                console.log('Events Captured: ', e);
-            }
+    const { onGrab } = props; 
+    const { startGrab, stopGrab } = useGrabEvent({
+        captureCB: onGrab ? onGrab : (e) => {
+            console.log('Events Captured: ', e);
         }
-    );
+    });
     const grabLabel = useMemo(() => {
         return !grabStarted ? 'Start' : 'Stop';
     }, [grabStarted]);

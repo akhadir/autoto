@@ -245,6 +245,19 @@ export default class TCForm extends React.Component {
         }
         return out;
     };
+    onGrab = (e) => {
+        this.state.events.push({
+            URL: '',
+            node: e.targetSelector,
+            event: Utils.getEventIndex(e.eventType),
+            evalue: '',
+            timer: this.props.settings.eventTimer,
+            screens: [],
+            assertions: []
+        });
+        const nEvents = [...this.state.events];
+        this.setState({events: nEvents});
+    };
     render = () => {
         return (
             <div>
@@ -260,7 +273,7 @@ export default class TCForm extends React.Component {
                         </div>
                     </div>
                     {this.getViewportForm(this.state.events[0], 0)}
-                    <EventGrabber />
+                    <EventGrabber  onGrab={this.onGrab} />
                     <div className="form-control-static">
                         {this.eventAssertions()}
                     </div>

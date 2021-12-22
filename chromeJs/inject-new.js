@@ -102,7 +102,6 @@ let winOver2;
             case UNGRAB_EVENTS1:
                 winOver2.ungrabEvents(options.events);
         }
-        console.log("Message from the background script:", request);
         return true;
     });
     winOver2 = {
