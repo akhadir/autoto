@@ -3,7 +3,7 @@ import Utils from "../util";
 
 export default function useGrabEvent(props: { captureCB?: (grabbedEvent) => void; enableMouseEvents?: boolean; }) {
     const { captureCB, enableMouseEvents } = props;
-    const evnts = ['click', 'focus', 'blur', 'keyup', 'keydown', 'keypressed', 'scroll', 'resize', 'drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'];
+    const evnts = ['click', 'focus', 'blur', 'keyup', 'keydown', 'keypressed', 'scroll', 'resize', 'drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop', 'selectionchange'];
     if (enableMouseEvents) {
         evnts.push('mouseup', 'mousedown', 'mousemove');
     }

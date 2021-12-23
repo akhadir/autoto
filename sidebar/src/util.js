@@ -98,7 +98,8 @@ export default class Utils {
             "ElementVisible",
             "ElementHidden",
             "Drag",
-            "Drop"
+            "Drop",
+            "TextSelection"
         ];
         return list;
     };
