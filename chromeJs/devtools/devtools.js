@@ -9,23 +9,25 @@
     chrome.devtools.panels.elements.createSidebarPane("Autoto", function (sidebar) {
         tcSidebar = sidebar;
         sidebar.setPage("sidebar.html");
-        let captureCB;
+        let captureCB = {};
         var _window; // Going to hold the reference to sidebar.html's `window`
         // script to connect to background script
         var data = [];
         var port = chrome.runtime.connect({name: 'devtools'});
         port.onMessage.addListener(function(msg) {
-            if (captureCB) {
-                captureCB(msg);
+            if (captureCB[msg.reqId]) {
+                captureCB[msg.reqId](msg);
             }
         });
-        const sendMessage = async (tabId, type, evnts, cb) => {
-            captureCB = cb;
+        const sendMessage = async (tabId, type, params, cb) => {
+            const reqId = Date.now();
+            captureCB[reqId] = cb;
             port.postMessage({
                 tabId,
+                reqId,
                 type,
                 options: {
-                    events: evnts
+                    params,
                 }
             });
         }
@@ -35,14 +37,6 @@
             if (_window.DomAgent) {
                 _window.DomAgent.sendMessage = sendMessage;
             }
-            // Release queued data
-            // var msg;
-            // while (msg = data.shift()) 
-            //     _window.do_something(msg);
-            // // Just to show that it's easy to talk to pass a message back:
-            // _window.respond = function(msg) {
-            //     port.postMessage(msg);
-            // };
         });
     });
     // chrome.devtools.panels.elements.onSelectionChanged.addListener(function (res) {

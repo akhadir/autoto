@@ -82,21 +82,24 @@ export default class Utils {
     };
     static getEventsList = () => {
         var list = [
-        "PageLoad",
-        "Click",
-        "Change",
-        "Hover",
-        "KeyPress",
-        "KeyUp",
-        "KeyDown",
-        "Focus",
-        "Blur",
-        "RightClick",
-        "DoubleClick",
-        "Submit",
-        "NetworkIdle",
-        "ElementVisible",
-        "ElementHidden"];
+            "PageLoad",
+            "Click",
+            "Change",
+            "Hover",
+            "KeyPress",
+            "KeyUp",
+            "KeyDown",
+            "Focus",
+            "Blur",
+            "RightClick",
+            "DoubleClick",
+            "Submit",
+            "NetworkIdle",
+            "ElementVisible",
+            "ElementHidden",
+            "Drag",
+            "Drop"
+        ];
         return list;
     };
     static grabEvents = (events, callback) => {

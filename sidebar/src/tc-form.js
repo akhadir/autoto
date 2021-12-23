@@ -246,11 +246,18 @@ export default class TCForm extends React.Component {
         return out;
     };
     onGrab = (e) => {
+        const { eventType } = e;
+        let evalue = '';
+        if (eventType.toLowerCase().startsWith('key')) {
+            evalue = String.fromCharCode(e.keyCode);
+        }
         this.state.events.push({
             URL: '',
             node: e.targetSelector,
-            event: Utils.getEventIndex(e.eventType),
-            evalue: '',
+            event: Utils.getEventIndex(eventType),
+            evalue: evalue,
+            keyCode: e.keyCode,
+            eventOptions: e,
             timer: this.props.settings.eventTimer,
             screens: [],
             assertions: []

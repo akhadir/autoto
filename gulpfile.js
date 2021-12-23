@@ -28,14 +28,14 @@ gulp.task('build:panel', function () {
 gulp.task('copy:chromefiles', function() {
     gulp.src('./manifest.json')
         .pipe(gulp.dest('./dist/'));
-    gulp.src('./chromeJs/*.*')
+    gulp.src('./chromeJs/**/*.*')
         .pipe(gulp.dest('./dist/chromeJs'));
     gulp.src('./chromeHTML/*.*')
-    .pipe(gulp.dest('./dist/'));
+        .pipe(gulp.dest('./dist/'));
     gulp.src('./extJs/*.*')
-    .pipe(gulp.dest('./dist/extJs/'));
+        .pipe(gulp.dest('./dist/extJs/'));
     return gulp.src('./icon.png')
-    .pipe(gulp.dest('./dist/'));
+        .pipe(gulp.dest('./dist/'));
 });
 gulp.task('minify-css', function() {
     return gulp.src('dist/**/*.css')

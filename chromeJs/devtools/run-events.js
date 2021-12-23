@@ -52,11 +52,14 @@
             if (eventName) {
                 if (event.evalue) {
                     value = event.evalue;
+                } else {
+                    value = '';
                 }
                 data = {
                     node: event.node,
                     event: eventName,
-                    value: value
+                    value: value,
+                    eventOptions: event,
                 };
                 window.DomAgent.process({ type: "DATA_POST_EVENTS", data: data, callback: function (res) {
                     setTimeout(function () {

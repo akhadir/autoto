@@ -130,138 +130,86 @@ const UNGRAB_EVENTS = 'ungrab_events';
     };
     var DomWorker = {
         getInnerText: function (req) {
-            var node = req.root,
-                code = "winOver.getInnerText('" + node + "')";
-            chrome.devtools.inspectedWindow.eval(code, {
-                "useContentScriptContext": true
-            }, (res, isException) => domCallback(res, isException, req, code));
+            let node = req.root;
+            if (DomAgent.sendMessage) {
+                DomAgent.sendMessage(chrome.devtools.inspectedWindow.tabId, 'getInnerText', [node], (res) => {
+                    domCallback(res.resp, false, req, 'getInnerText');
+                });
+            } else {
+                console.log('BG Port not initialized');
+            }
         },
         getNodeCount: function (req) {
-            var node = req.root,
-                code = "winOver.getNodeCount('" + node + "')";
-            chrome.devtools.inspectedWindow.eval(code, {
-                "useContentScriptContext": true
-            }, (res, isException) => domCallback(res, isException, req, code));
+            let node = req.root;
+            if (DomAgent.sendMessage) {
+                DomAgent.sendMessage(chrome.devtools.inspectedWindow.tabId, 'getNodeCount', [node], (res) => {
+                    domCallback(res.resp, false, req, 'getInnerText');
+                });
+            } else {
+                console.log('BG Port not initialized');
+            }
         },
         getInspWindowViewPort: function (req) {
-            var code = "winOver.getViewport()";
-            chrome.devtools.inspectedWindow.eval(code, {
-                "useContentScriptContext": true
-            }, (res, isException) => domCallback(res, isException, req, code));
+            if (DomAgent.sendMessage) {
+                DomAgent.sendMessage(chrome.devtools.inspectedWindow.tabId, 'getViewport', undefined, (res) => {
+                    domCallback(res.resp, false, req, 'getInnerText');
+                });
+            } else {
+                console.log('BG Port not initialized');
+            }
         },
         getInspWindowURL: function (req) {
-            chrome.tabs.get(chrome.devtools.inspectedWindow.tabId, function(tab) {
+            chrome.tabs.get(chrome.devtools.inspectedWindow.tabId, function (tab) {
                 req.callback(tab.url);
             });
         },
         getScreen: function (req) {
-            chrome.tabs.get(chrome.devtools.inspectedWindow.tabId, function(tab) {
-                chrome.tabs.captureVisibleTab(tab.windowId, {format: "png"}, function(res) {
+            chrome.tabs.get(chrome.devtools.inspectedWindow.tabId, function (tab) {
+                chrome.tabs.captureVisibleTab(tab.windowId, { format: "png" }, function (res) {
                     var origCallback = req.callback;
                     req.callback = function (newRes) {
-                        origCallback({ image: res, clip: JSON.parse(newRes) });
+                        origCallback({ image: res, clip: newRes });
                     }
                     DomWorker.getRect(req);
                 });
             });
         },
-        takeScreenShot: function (req) {
-            var self = this,
-                node = "body",
-                id;
-            if (req.root) {
-                node = req.root;
+        getRect: function (req) {
+            let node = req.root;
+            if (DomAgent.sendMessage) {
+                DomAgent.sendMessage(chrome.devtools.inspectedWindow.tabId, 'getRect', [node], (res) => {
+                    domCallback(res.resp, false, req, 'getRect');
+                });
+            } else {
+                console.log('BG Port not initialized');
             }
-            id = window.md5(node);
-            var code = "winOver.takeScreenShot('" + node + "', '" + id + "')";
-            chrome.devtools.inspectedWindow.eval(code, {
-                "useContentScriptContext": true
-            }, function (result, isException) {
-                if (!isException) {
-                    self.getScreenShot(id, req.callback);
-                }
-                else {
-                    console.log(code);
-                    console.log("Exception: " + JSON.stringify(isException));
-                }
-            });
         },
-        getScreenShot: function (id, callback, index) {
-            var self = this,
-                code;
-            setTimeout (function () {
-                code = "winOver.getScreenShots('" + id + "')";
-                chrome.devtools.inspectedWindow.eval(code, {
-                    "useContentScriptContext": true
-                }, function (result, isException) {
-                    if (!isException) {
-                        if (result === '') {
-                            if (!index) {
-                                index = 0;
-                            } else {
-                                index++;
-                            }
-                            if (index <= 5) {
-                                self.getScreenShot(id, callback, index);
-                            } else {
-                                console.log("Exception: No of attempts to capture screen shot has exceeded.");
-                            }
-                        } else {
-                            callback(result);
-                        }
-                    }
-                    else {
-                        console.log(code);
-                        console.log("Exception: " + JSON.stringify(isException));
+        getSelector: function (req) {
+            let data = { "selector": undefined };
+            let inp = ['$0', '', req.data.usi];
+            if (req.root) {
+                inp = ['$0', req.root, req.data.usi];
+            }
+            if (DomAgent.sendMessage) {
+                DomAgent.sendMessage(chrome.devtools.inspectedWindow.tabId, 'getSelector', inp, (result) => {
+                    data.selector = result.resp;
+                    if (req.callback) {
+                        req.callback(result.resp);
                     }
                 });
-            }, 1000);
-        },
-        getRect: function(req) {
-            var node = req.root,
-                code = "winOver.getRect('" + node + "')";
-            chrome.devtools.inspectedWindow.eval(code, {
-                "useContentScriptContext": true
-            }, function (result, isException) {
-                if (!isException) {
-                    if (req.callback) {
-                        req.callback(result);
-                    }
-                }
-                else {
-                    console.log("Exception" + isException);
-                }
-            });
-        },
-        getSelector: function(req) {
-            var data = { "selector": undefined }, code = "winOver.getSelector($0, ''," + req.data.usi + ")";
-            if (req.root) {
-                code = "winOver.getSelector($0, '" + req.root + "', " + req.data.usi + ")";
+            } else {
+                console.log('BG Port not initialized');
             }
-            chrome.devtools.inspectedWindow.eval(code, {
-                "useContentScriptContext": true
-            }, function (result, isException) {
-                if (!isException) {
-                    data.selector = result;
-                    if (req.callback) {
-                        req.callback(result);
-                    }
-                }
-                else {
-                    console.log("Exception" + isException);
-                }
-            });
         },
         getSelectorForce: function (req) {
-            var data = { selector: undefined }, code = "winOver.getSelectorForce($0, '" + req.root + "', " + req.data.usi + ")";
-            chrome.devtools.inspectedWindow.eval(code, {
-                "useContentScriptContext": true
-            }, function (result, isException) {
-                if (!isException) {
+            let data = { "selector": undefined };
+            let inp = ['$0', req.root, req.data.usi];
+            if (DomAgent.sendMessage) {
+                DomAgent.sendMessage(chrome.devtools.inspectedWindow.tabId, 'getSelectorForce', inp, (result) => {
                     if (result) {
-                        data.selector = result;
+                        data.selector = result.resp;
                         if (req.callback) {
-                            req.callback(result);
+                            req.callback(result.resp);
                         }
                     }
                     else {
@@ -269,39 +217,36 @@ const UNGRAB_EVENTS = 'ungrab_events';
                             DomWorker.getSelectorForce(req);
                         }, 1000);
                     }
-                }
-                else {
-                    console.log("Exception" + isException);
-                }
-            });
+                });
+            } else {
+                console.log('BG Port not initialized');
+            }
         },
         getChildren: function (req) {
-            var data = { selector: undefined }, pnode = req.root;
-            chrome.devtools.inspectedWindow.eval("winOver.getChildren('" + pnode + "', " + req.data.usi + ")", {
-                "useContentScriptContext": true
-            }, function (result, isException) {
-                if (!isException) {
-                    data.selector = result;
+            let data = { "selector": undefined };
+            let inp = ['$0', '', req.data.usi];
+            let parentNode = req.root;
+            if (req.root) {
+                inp = [parentNode, req.data.usi];
+            }
+            if (DomAgent.sendMessage) {
+                DomAgent.sendMessage(chrome.devtools.inspectedWindow.tabId, 'getSelector', inp, (result) => {
+                    data.selector = result.resp;
                     if (req.callback) {
-                        req.callback(result);
+                        req.callback(result.resp);
                     }
-                }
-                else {
-                    console.log("Exception" + isException);
-                }
-            });
+                });
+            } else {
+                console.log('BG Port not initialized');
+            }
         },
         postEvents: function (req) {
-            var data = req.data, code = "winOver.postEvents('" + data.node + "', '" + data.event + "', '" + data.value + "')";
-            chrome.devtools.inspectedWindow.eval(code, {
-                "useContentScriptContext": true
-            }, function (result, isException) {
-                if (!isException) {
-                    if (req.callback) {
-                        req.callback(true);
-                    }
-                }
-            });
+            var data = req.data;
+            if (DomAgent.sendMessage) {
+                DomAgent.sendMessage(chrome.devtools.inspectedWindow.tabId, 'postEvents', data.event, () => { });
+            } else {
+                console.log('BG Port not initialized');
+            }
         },
         _find: function (array, key, kvalue) {
             var i, out, temp, len = array.length;
@@ -336,34 +281,40 @@ const UNGRAB_EVENTS = 'ungrab_events';
             });
         },
         getProperties: function (req) {
-            var data = { data: {}, root: String, node: String }, dat = req.data, root = dat.root, node = dat.node, index = dat.nodeIndex, properties = dat.props, propString = JSON.stringify(properties), code = "winOver.getComputedProps('" + root + "', '" + node + "'," + index + ", " + propString + ")";
-            chrome.devtools.inspectedWindow.eval(code, {
-                "useContentScriptContext": true
-            }, function (result, isException) {
-                if (!isException) {
-                    data.data = result;
+            var data = { data: {}, root: '', node: '' },
+                dat = req.data,
+                root = dat.root,
+                node = dat.node,
+                index = dat.nodeIndex,
+                properties = dat.props,
+                propString = JSON.stringify(properties),
+                params = [root, node, index, propString];
+            if (DomAgent.sendMessage) {
+                DomAgent.sendMessage(chrome.devtools.inspectedWindow.tabId, 'getComputedProps', params, (result) => {
+                    data.data = result.resp;
                     data.root = root;
                     data.node = node;
                     if (req.callback) {
                         req.callback(data);
                     }
-                }
-                else {
-                    console.log(code);
-                    console.log("Exception: " + JSON.stringify(isException));
-                }
-            });
+                });
+            } else {
+                console.log('BG Port not initialized');
+            }
         },
         getOtherCalls: function (req) {
             var dat = req.data,
                 node = dat.dataNode,
-                attr = dat.dataAttrib,
-                code = "winOver.getOtherCalls('" + node + "', '" + attr + "')";
-            chrome.devtools.inspectedWindow.eval(code, {
-                "useContentScriptContext": true
-            }, (res, isException) => domCallback(res, isException, req, code));
+                attr = dat.dataAttrib;
+            if (DomAgent.sendMessage) {
+                DomAgent.sendMessage(chrome.devtools.inspectedWindow.tabId, 'getOtherCalls', [node, attr], (res) => {
+                    domCallback(res.resp, false, req, 'getOtherCalls');
+                });
+            } else {
+                console.log('BG Port not initialized');
+            }
         },
-        
+
     };
 })(window);
 //# sourceMappingURL=DomAgent.js.map

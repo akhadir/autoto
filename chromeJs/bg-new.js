@@ -34,7 +34,7 @@
                 msg.tabId,
                 msg,
                 (response) => {
-                    // console.log("Message from the content script:", response);
+                    msg.callback(response)
                 }
             );
         } catch(e) {

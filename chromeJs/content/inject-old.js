@@ -207,14 +207,14 @@ var winOver;
             }
             return out;
         },
-        postEvents: function (node, event, value) {
+        postEvents: function (node, event, value, eventOptions?: Event) {
             var jnode;
             if ($) {
                 jnode = $(node);
                 if (value) {
                     jnode.val(value);
                 }
-                dispatcherEvent(jnode[0], event, true, true);
+                dispatcherEvent(jnode[0], eventOptions, event, true, true);
             }
             else {
                 throw "JQUERY INJECT IS NOT WORKING";
@@ -249,9 +249,17 @@ var winOver;
             return $(node).length;
         }
     };
-    var dispatcherEvent = function (target, ...args) {
+    var dispatcherEvent = function (target, eventOptions, ...args) {
         var e = document.createEvent("Event");
         e.initEvent.apply(e, args);
+        if (eventOptions) {
+            e.altKey = eventOptions.altKey;
+            e.ctrlKey = eventOptions.ctrlKey;
+            e.shiftKey = eventOptions.shiftKey;
+            e.metaKey = eventOptions.metaKey;
+            e.keyCode = eventOptions.keyCode;
+            e.charCode = eventOptions.charCode;
+        }
         target.dispatchEvent(e);
     };
 })();
