@@ -258,7 +258,7 @@ export default class TCForm extends React.Component {
             evalue: evalue,
             keyCode: e.keyCode,
             eventOptions: e,
-            timer: this.props.settings.eventTimer,
+            timer: 0.3,
             screens: [],
             assertions: []
         });

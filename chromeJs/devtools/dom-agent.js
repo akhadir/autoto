@@ -67,8 +67,6 @@ const UNGRAB_EVENTS = 'ungrab_events';
                     this.run(out);
                 }
             },
-            // new sendMessage replacing eval.
-            // TODO: Migrate all eval to sendMessage
             grabEvents: function (evnts, captureCB) {
                 if (DomAgent.sendMessage) {
                     DomAgent.sendMessage(chrome.devtools.inspectedWindow.tabId, GRAB_EVENTS, evnts, captureCB);
@@ -243,7 +241,11 @@ const UNGRAB_EVENTS = 'ungrab_events';
         postEvents: function (req) {
             var data = req.data;
             if (DomAgent.sendMessage) {
-                DomAgent.sendMessage(chrome.devtools.inspectedWindow.tabId, 'postEvents', data.event, () => { });
+                const options = data && data.eventOptions && data.eventOptions.eventOptions;
+                const params = [data.node, data.event, '', options];
+                DomAgent.sendMessage(chrome.devtools.inspectedWindow.tabId, 'postEvents', params, () => { 
+                    req.callback();
+                });
             } else {
                 console.log('BG Port not initialized');
             }

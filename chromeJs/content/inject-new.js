@@ -67,7 +67,7 @@
             const grabbedEvent = {
                 event: e,
                 eventType: et,
-                targetSelector: trgt,
+                targetSelector: trgt || 'window',
                 // target: target,
                 scrollTop: scrolltop,
                 pointer: {
@@ -341,11 +341,15 @@
         postEvents: function (node, event, value, options) {
             var jnode;
             if ($) {
+                if (node === 'window') {
+                    node = window;
+                }
                 jnode = $(node);
                 if (value) {
                     jnode.val(value);
                 }
-                dispatcherEvent(jnode[0], options, event, true, true);
+                let domNode = jnode.get(0);
+                dispatcherEvent(domNode, options, event, true, true);
             }
             else {
                 throw "JQUERY INJECT IS NOT WORKING";
@@ -381,16 +385,26 @@
         }
     };
     var dispatcherEvent = function (target, eventOptions, ...args) {
-        var e = document.createEvent("Event");
-        e.initEvent.apply(e, args);
-        if (eventOptions) {
-            e.altKey = eventOptions.altKey;
-            e.ctrlKey = eventOptions.ctrlKey;
-            e.shiftKey = eventOptions.shiftKey;
-            e.metaKey = eventOptions.metaKey;
-            e.keyCode = eventOptions.keyCode;
-            e.charCode = eventOptions.charCode;
+        if (eventOptions && args[0].startsWith('key')) {
+            const charCode = String.fromCharCode(eventOptions.keyCode);
+            const e = new KeyboardEvent(args[0], {
+                key: charCode,
+                keyCode: eventOptions.keyCode,
+                // code: "KeyE",
+                which: eventOptions.keyCode,
+                shiftKey: eventOptions.ctrlKeys.indexOf('shift') > -1,
+                ctrlKey: eventOptions.ctrlKeys.indexOf('ctrl') > -1,
+                metaKey: eventOptions.ctrlKeys.indexOf('meta') > -1,
+                altKey: eventOptions.ctrlKeys.indexOf('alt') > -1
+            });
+            document.dispatchEvent(e);
+            if (charCode && args[0] === 'keyup') {
+                target.value += charCode;
+            }
+        } else if (target) {
+            var e = document.createEvent("Event");
+            e.initEvent.apply(e, args);
+            target.dispatchEvent(e);
         }
-        target.dispatchEvent(e);
     };
 })();
